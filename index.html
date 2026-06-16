@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>区域导航 · Area Navigator V0.92</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .app-container { width: 100%; max-width: 500px; height: 100vh; max-height: 900px; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 30px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; transition: max-width 0.3s, border-radius 0.3s; }
+    body.desktop-mode .app-container { max-width: 1200px; border-radius: 10px; }
+    body.desktop-mode .modal { max-width: 600px; }
+    .nav-bar { background: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 8px; }
+    .nav-bar .title { font-weight: 600; font-size: 18px; }
+    .nav-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .icon-btn { background: #f5f5f5; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+    .icon-btn:active { transform: scale(0.94); background: #e0e0e0; }
+    .icon-btn:hover { transform: scale(1.05); background: #e9e9e9; }
+    .mode-badge { background: #e67e22; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s, background 0.2s; }
+    .mode-badge:active { transform: scale(0.96); background: #d35400; }
+    .mode-badge:hover { transform: scale(1.02); background: #f39c12; }
+    .undo-redo-group { display: flex; gap: 4px; background: #f0f0f0; border-radius: 30px; padding: 2px; margin-left: 4px; }
+    .undo-redo-group button { background: transparent; border: none; font-size: 18px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+    .undo-redo-group button:active { transform: scale(0.92); background: #ddd; }
+    .undo-redo-group button:hover { transform: scale(1.05); background: #e5e5e5; }
+    .content { flex: 1; display: flex; flex-direction: column; padding: 8px; background: #fafafa; overflow: hidden; }
+    .search-box { display: flex; gap: 8px; margin-bottom: 8px; }
+    #searchInput { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; font-size: 15px; background: white; transition: border-color 0.2s; }
+    #searchInput:focus { border-color: #e67e22; }
+    #searchBtn { padding: 10px 16px; background: #e67e22; color: white; border: none; border-radius: 25px; font-size: 15px; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+    #searchBtn:active { transform: scale(0.96); background: #d35400; }
+    #searchBtn:hover { transform: scale(1.02); background: #f39c12; }
+    .canvas-wrapper { flex: 1; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #fff; border-radius: 12px; border: 1px solid #eee; position: relative; }
+    canvas { display: block; touch-action: none; }
+    .toolbar { display: flex; justify-content: center; gap: 8px; padding: 10px 0; background: #fff; border-top: 1px solid #eee; flex-wrap: wrap; }
+    .toolbar button, .toolbar select { background: #f0f0f0; border: none; padding: 8px 14px; border-radius: 25px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s, background 0.2s; }
+    .toolbar button:active, .toolbar select:active { transform: scale(0.96); background: #e0e0e0; }
+    .toolbar button:hover, .toolbar select:hover { transform: scale(1.02); background: #e6e6e6; }
+    .toolbar .primary-btn { background: #e67e22; color: white; }
+    .toolbar .primary-btn:active { background: #d35400; }
+    .toolbar .export-btn { background: #3498db; color: white; }
+    .toolbar .export-btn:active { background: #2980b9; }
+    .toolbar .import-btn { background: #2ecc71; color: white; }
+    .toolbar .import-btn:active { background: #27ae60; }
+    .toolbar .reset-view-btn { background: #95a5a6; color: white; }
+    .toolbar .snap-btn { background: #95a5a6; color: white; }
+    .toolbar .snap-btn.active { background: #e67e22; }
+    .toolbar .area-multi-select-btn { background: #95a5a6; color: white; margin-left: 4px; }
+    .toolbar .area-multi-select-btn.active { background: #e67e22; }
+    .toolbar .area-copy-btn { background: #3498db; color: white; display: none; margin-left: 4px; }
+    .toolbar .batch-select { background: #f0f0f0; border: none; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-left: 4px; display: none; transition: transform 0.2s, background 0.2s; }
+    .toolbar .batch-select:active { transform: scale(0.96); }
+    .align-hint { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #ffeb3b; padding: 4px 12px; border-radius: 20px; font-size: 12px; z-index: 2000; pointer-events: none; font-family: monospace; white-space: nowrap; }
+    .announcement-overlay { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 10000; cursor: pointer; }
+    .announcement-modal { background: white; border-radius: 20px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); cursor: default; pointer-events: auto; }
+    .announcement-modal h2 { margin-bottom: 15px; color: #e67e22; }
+    .announcement-modal p { margin: 10px 0; font-size: 14px; line-height: 1.6; text-align: left; }
+    .announcement-modal .version { color: #999; font-size: 12px; margin-top: 15px; }
+    .announcement-buttons { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
+    .announcement-buttons button { padding: 10px 25px; border-radius: 25px; border: none; cursor: pointer; font-size: 14px; pointer-events: auto; transition: transform 0.2s; }
+    .announcement-buttons button:active { transform: scale(0.96); }
+    .btn-acknowledge { background: #e67e22; color: white; }
+    .btn-close-announce { background: #f0f0f0; color: #333; }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+    .modal { background: white; border-radius: 20px; padding: 0; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; display: flex; flex-direction: column; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 10px; border-bottom: 1px solid #eee; position: sticky; top: 0; background: white; z-index: 5; border-radius: 20px 20px 0 0; }
+    .modal-header h3 { margin: 0; font-size: 18px; }
+    .modal-close-btn { background: none; border: none; font-size: 24px; color: #999; cursor: pointer; line-height: 1; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 0.2s; }
+    .modal-close-btn:active { transform: scale(0.9); }
+    .modal-body { padding: 15px 20px 20px; overflow-y: auto; flex: 1; position: relative; display: flex; flex-direction: column; }
+    .modal-body input[type="text"], .modal-body input[type="number"], .modal-body select { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; transition: border-color 0.2s; }
+    .modal-body input:focus, .modal-body select:focus { border-color: #e67e22; outline: none; }
+    .modal-body input[type="color"] { width: 100%; height: 40px; margin: 6px 0; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; }
+    .modal-body input[type="file"] { margin: 8px 0; padding: 8px; border: 1px solid #ddd; border-radius: 10px; }
+    .modal-body textarea { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; font-family: monospace; resize: vertical; }
+    .modal-body label { display: block; text-align: left; font-weight: bold; margin-top: 8px; font-size: 14px; }
+    .modal-buttons { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+    .modal-buttons button { flex: 1; padding: 12px 0; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+    .modal-buttons button:active { transform: scale(0.96); }
+    .modal-buttons button:hover { transform: scale(1.02); }
+    .btn-primary { background: #e67e22; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-secondary { background: #f0f0f0; color: #333; }
+    .btn-success { background: #2ecc71; color: white; }
+    .btn-info { background: #3498db; color: white; }
+    .btn-star { background: #f39c12; color: white; }
+    .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 25px; border-radius: 25px; font-size: 14px; z-index: 2001; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .zoom-slider-container { display: flex; align-items: center; gap: 5px; }
+    #zoomSlider { width: 80px; cursor: pointer; transition: transform 0.1s; }
+    #zoomSlider:active { transform: scaleY(1.2); }
+    .product-zoom-slider { display: flex; align-items: center; gap: 5px; margin: 0; }
+    .product-zoom-slider input { width: 80px; }
+    .toolbar-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .sort-controls-compact { display: flex; gap: 6px; align-items: center; }
+    .sort-controls-compact select { padding: 4px 6px; border-radius: 16px; border: 1px solid #ddd; background: white; font-size: 12px; cursor: pointer; width: auto; transition: transform 0.2s; }
+    .sort-controls-compact select:active { transform: scale(0.96); }
+    .select-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .select-btn { background: #f0f0f0; border: none; padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s, background 0.2s; }
+    .select-btn:active { transform: scale(0.94); background: #e0e0e0; }
+    .select-btn.active { background: #e67e22; color: white; }
+    .select-btn.select-all-active { background: #2ecc71; color: white; }
+    .action-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+    .action-buttons button { background: #f0f0f0; border: none; padding: 5px 10px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s, background 0.2s; }
+    .action-buttons button:active { transform: scale(0.96); }
+    .action-buttons button:hover { transform: scale(1.02); background: #e6e6e6; }
+    .action-buttons .btn-primary { background: #e67e22; color: white; }
+    .action-buttons .btn-info { background: #3498db; color: white; }
+    .action-buttons .btn-success { background: #2ecc71; color: white; }
+    .batch-action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #ddd; padding: 12px 20px; display: flex; gap: 15px; justify-content: center; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); flex-wrap: wrap; }
+    .batch-action-bar button { padding: 8px 16px; border-radius: 25px; font-size: 13px; cursor: pointer; border: none; transition: transform 0.2s, background 0.2s; }
+    .batch-action-bar button:active { transform: scale(0.96); }
+    .batch-action-bar button:hover { transform: scale(1.02); }
+    .batch-action-bar .btn-move { background: #3498db; color: white; }
+    .batch-action-bar .btn-delete { background: #e74c3c; color: white; }
+    .batch-action-bar .btn-cancel { background: #95a5a6; color: white; }
+    .batch-action-bar .btn-download-img { background: #2ecc71; color: white; }
+    .batch-action-bar .btn-download-csv { background: #3498db; color: white; }
+    .batch-action-bar .btn-star-collect { background: #f39c12; color: white; }
+    .product-card { position: relative; transition: all 0.1s; cursor: pointer; user-select: none; }
+    .product-card.selected { background: #ffe0b3; border: 2px solid #e67e22; }
+    .product-card.starred { border: 2px solid #f39c12; background: #fff8e7; }
+    .product-card .star-badge { position: absolute; top: 2px; right: 2px; font-size: 14px; color: #f39c12; background: rgba(255,255,255,0.8); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .product-checkbox { position: absolute; top: 5px; left: 5px; width: 18px; height: 18px; cursor: pointer; z-index: 10; display: none; }
+    .product-card.select-mode .product-checkbox { display: block; }
+    .product-grid-container { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; }
+    .product-grid { display: grid; gap: 10px; overflow-y: auto; padding: 2px; flex: 1; }
+    .product-card { border: 1px solid #eee; border-radius: 10px; padding: 8px; text-align: center; position: relative; }
+    .product-card .img-container { width: 100%; height: 100px; display: flex; justify-content: center; align-items: center; background: #f5f5f5; border-radius: 6px; margin-bottom: 5px; }
+    .product-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .product-card .prod-name { font-size: 13px; font-weight: bold; word-break: break-word; }
+    .product-card .actions { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+    .product-card .actions button {
+      background: none; border: none; font-size: 20px; cursor: pointer; padding: 6px 8px; border-radius: 8px;
+      transition: all 0.2s ease; position: relative;
+    }
+    .product-card .actions button:hover { background: #f0f0f0; transform: scale(1.08); }
+    .product-card .actions button:active { transform: scale(0.94); }
+    .product-card .actions button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      margin-bottom: 6px;
+      font-family: system-ui, -apple-system, sans-serif;
+      z-index: 100;
+    }
+    .product-card .actions button:hover::after { opacity: 1; }
+    .selection-rect { position: absolute; border: 2px solid #e67e22; background: rgba(230,126,34,0.1); pointer-events: none; z-index: 1000; display: none; }
+    .scroll-buttons { position: sticky; bottom: 0; background: white; padding: 8px 0; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #eee; margin-top: 5px; }
+    .scroll-buttons button { background: #f0f0f0; border: none; padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: transform 0.2s; }
+    .scroll-buttons button:active { transform: scale(0.94); }
+    .area-menu-btns { display: flex; flex-direction: column; gap: 10px; }
+    .area-menu-btns button { padding: 12px; border-radius: 12px; font-size: 16px; border: none; background: #f5f5f5; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+    .area-menu-btns button:active { transform: scale(0.96); background: #e0e0e0; }
+    .area-menu-btns button:hover { transform: scale(1.02); background: #e9e9e9; }
+    .image-preview-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; }
+    .image-preview-overlay img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 10px; }
+    .image-preview-overlay .close-preview { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; background: none; border: none; transition: transform 0.2s; }
+    .image-preview-overlay .close-preview:active { transform: scale(0.9); }
+    .import-banner { display: none; background: #ffeaa7; color: #333; text-align: center; padding: 8px; font-size: 13px; border-radius: 8px; margin-bottom: 6px; }
+    .detail-table { width: 100%; text-align: left; margin: 10px 0; border-collapse: collapse; }
+    .detail-table td { padding: 6px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+    .detail-table td:first-child { font-weight: bold; width: 80px; color: #555; }
+    #detailImage { cursor: pointer; max-width: 200px; max-height: 200px; width: auto; height: auto; display: block; margin: 10px auto; object-fit: contain; background: #f5f5f5; border-radius: 10px; transition: transform 0.2s; }
+    #detailImage:active { transform: scale(0.98); }
+    .detail-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+    .nav-arrow { background: #f0f0f0; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+    .nav-arrow:active { transform: scale(0.92); background: #e0e0e0; }
+    .nav-arrow:hover { transform: scale(1.05); background: #e6e6e6; }
+    .nav-arrow.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+    .detail-counter { font-size: 14px; color: #666; flex: 1; text-align: center; }
+    .btn-delete-area { background: #e74c3c; color: white; border: none; padding: 12px 0; border-radius: 25px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 8px; transition: transform 0.2s; }
+    .btn-delete-area:active { transform: scale(0.96); }
+    .btn-copy-area { background: #3498db; color: white; border: none; padding: 12px 0; border-radius: 25px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 8px; transition: transform 0.2s; }
+    .btn-copy-area:active { transform: scale(0.96); }
+    .readonly-field { background: #f5f5f5; padding: 12px; border-radius: 10px; font-size: 14px; margin: 6px 0; color: #555; }
+    .text-direction-preview { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+    .direction-option { flex: 1; text-align: center; padding: 8px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; background: #f9f9f9; transition: transform 0.2s, border-color 0.2s; }
+    .direction-option:active { transform: scale(0.96); }
+    .direction-option.selected { border-color: #e67e22; background: #fef5e8; }
+    .style-copy-area { background: #f0f8ff; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+    .style-copy-buttons { display: flex; gap: 10px; margin-top: 10px; }
+    .style-copy-buttons button { transition: transform 0.2s; }
+    .style-copy-buttons button:active { transform: scale(0.96); }
+    .preview-area { background: #f5f5f5; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 200px; overflow: auto; margin-top: 10px; }
+    .excel-hint { font-size: 12px; color: #999; margin-top: 8px; text-align: left; }
+    .field-mapping { background: #f9f9f9; padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 13px; }
+    .field-mapping select { width: auto; min-width: 120px; margin-left: 8px; padding: 4px 8px; }
+    .field-mapping-row { margin: 8px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .progress-bar { width: 100%; height: 6px; background: #eee; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: #e67e22; width: 0%; transition: width 0.3s; }
+    .map-select-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 5000; }
+    .map-select-container { background: #fff; border-radius: 20px; width: 95%; max-width: 1200px; height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    .map-select-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee; }
+    .map-select-header h4 { margin: 0; font-size: 16px; }
+    .map-select-header button { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; transition: transform 0.2s; }
+    .map-select-header button:active { transform: scale(0.9); }
+    .map-canvas-wrapper { flex: 1; padding: 15px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    .map-select-canvas { width: 100%; height: 100%; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; background: white; }
+    .map-select-footer { padding: 12px 20px; border-top: 1px solid #eee; text-align: center; font-size: 13px; color: #666; }
+    .duplicate-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 10001; }
+    .duplicate-dialog { background: white; border-radius: 20px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .duplicate-dialog h4 { margin-bottom: 15px; color: #e67e22; }
+    .duplicate-dialog .product-info { background: #f5f5f5; padding: 12px; border-radius: 10px; margin: 10px 0; font-size: 14px; word-break: break-word; }
+    .duplicate-dialog .options { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+    .duplicate-dialog .option-btn { padding: 10px; border-radius: 10px; border: 1px solid #ddd; background: #f9f9f9; cursor: pointer; text-align: left; transition: transform 0.2s, background 0.2s; }
+    .duplicate-dialog .option-btn:active { transform: scale(0.96); }
+    .duplicate-dialog .option-btn:hover { background: #e67e22; color: white; border-color: #e67e22; }
+    .duplicate-dialog .apply-all { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
+    .duplicate-dialog .apply-all label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; }
+    .duplicate-dialog .close-dialog { margin-top: 15px; width: 100%; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 25px; cursor: pointer; transition: transform 0.2s; }
+    .duplicate-dialog .close-dialog:active { transform: scale(0.96); }
+    .image-batch-preview-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 10002; }
+    .image-batch-preview-container { background: white; border-radius: 20px; width: 90%; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+    .image-batch-preview-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .image-batch-preview-header button { background: none; border: none; font-size: 24px; cursor: pointer; transition: transform 0.2s; }
+    .image-batch-preview-header button:active { transform: scale(0.9); }
+    .image-batch-preview-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+    .image-preview-item { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #eee; border-radius: 10px; background: #f9f9f9; }
+    .image-preview-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #fff; }
+    .image-preview-item .info { flex: 1; }
+    .image-preview-item .info .name { font-weight: bold; font-size: 14px; }
+    .image-preview-item .info .barcode { font-size: 12px; color: #666; margin-top: 4px; }
+    .image-preview-item .status { font-size: 12px; padding: 4px 8px; border-radius: 12px; }
+    .image-preview-item .status.success { background: #d4edda; color: #155724; }
+    .image-preview-item .status.fail { background: #f8d7da; color: #721c24; }
+    .image-batch-preview-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end; }
+    .image-batch-preview-footer button { transition: transform 0.2s; }
+    .image-batch-preview-footer button:active { transform: scale(0.96); }
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 20000; }
+    .loading-content { background: white; padding: 20px 30px; border-radius: 30px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .loading-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #e67e22; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: #333; }
+    .master-tip {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #ffeb3b;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 2000;
+      pointer-events: none;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+
+
+    /* ===== V0.92 UI Beautify Pack ===== */
+    :root {
+      --brand: #f97316;
+      --brand-deep: #ea580c;
+      --brand-soft: #fff7ed;
+      --brand-ring: rgba(249, 115, 22, .28);
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --panel: rgba(255, 255, 255, .88);
+      --surface: #ffffff;
+      --bg-a: #fff7ed;
+      --bg-b: #eef2ff;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --shadow-soft: 0 18px 55px rgba(15, 23, 42, .12);
+      --shadow-card: 0 10px 28px rgba(15, 23, 42, .08);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(249, 115, 22, .16), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(59, 130, 246, .12), transparent 26%),
+        linear-gradient(135deg, var(--bg-a), #f8fafc 45%, var(--bg-b));
+      padding: 14px;
+    }
+
+    .app-container {
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.74);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+    }
+    body.desktop-mode .app-container { border-radius: 24px; }
+
+    .nav-bar {
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,247,237,.92));
+      border-bottom: 1px solid rgba(229,231,235,.8);
+      padding: 14px 16px;
+      box-shadow: 0 6px 24px rgba(15,23,42,.04);
+    }
+    .nav-bar .title {
+      font-size: 19px;
+      letter-spacing: .2px;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .content {
+      background: linear-gradient(180deg, rgba(248,250,252,.82), rgba(255,255,255,.74));
+      padding: 12px;
+      gap: 10px;
+    }
+
+    .search-box {
+      background: var(--surface);
+      border: 1px solid rgba(229,231,235,.9);
+      border-radius: 999px;
+      padding: 5px;
+      box-shadow: 0 8px 24px rgba(15,23,42,.06);
+      margin-bottom: 0;
+    }
+    #searchInput {
+      border: none;
+      background: transparent;
+      padding: 10px 14px;
+      color: var(--ink);
+    }
+    #searchInput:focus { box-shadow: none; }
+    #searchBtn,
+    .mode-badge,
+    .toolbar .primary-btn,
+    .btn-primary,
+    .btn-acknowledge {
+      background: linear-gradient(135deg, var(--brand), var(--brand-deep));
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(249, 115, 22, .24);
+    }
+    #searchBtn:hover,
+    .mode-badge:hover,
+    .toolbar .primary-btn:hover,
+    .btn-primary:hover,
+    .btn-acknowledge:hover { filter: brightness(1.03); }
+    .toolbar .primary-btn.active {
+      background: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22,163,74,.18), 0 10px 24px rgba(22,163,74,.2);
+    }
+
+    .icon-btn,
+    .undo-redo-group,
+    .toolbar button,
+    .toolbar select,
+    .select-btn,
+    .action-buttons button,
+    .scroll-buttons button,
+    .modal-buttons button,
+    .nav-arrow {
+      border: 1px solid rgba(229,231,235,.88);
+      box-shadow: 0 4px 12px rgba(15,23,42,.05);
+    }
+    .icon-btn,
+    .undo-redo-group button,
+    .select-btn,
+    .scroll-buttons button,
+    .nav-arrow { background: #fff; }
+
+    .toolbar {
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(229,231,235,.85);
+      border-radius: 22px;
+      padding: 10px;
+      box-shadow: 0 10px 28px rgba(15,23,42,.07);
+    }
+    .toolbar button,
+    .toolbar select {
+      min-height: 36px;
+      background: #fff;
+      color: #374151;
+    }
+    .toolbar .export-btn { background: linear-gradient(135deg, #38bdf8, #2563eb); }
+    .toolbar .import-btn { background: linear-gradient(135deg, #34d399, #059669); }
+    .toolbar .reset-view-btn,
+    .toolbar .snap-btn,
+    .toolbar .area-multi-select-btn { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .toolbar .snap-btn.active,
+    .toolbar .area-multi-select-btn.active { background: linear-gradient(135deg, var(--brand), var(--brand-deep)); }
+
+    .canvas-wrapper {
+      border-radius: 22px;
+      border: 1px solid rgba(229,231,235,.9);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.94), rgba(248,250,252,.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 14px 34px rgba(15,23,42,.08);
+    }
+
+    .modal-overlay,
+    .announcement-overlay,
+    .map-select-overlay,
+    .image-preview-overlay,
+    .image-batch-preview-overlay,
+    .duplicate-dialog-overlay,
+    .loading-overlay { backdrop-filter: blur(8px); }
+
+    .modal,
+    .announcement-modal,
+    .map-select-container,
+    .duplicate-dialog,
+    .image-batch-preview-container,
+    .loading-content {
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: var(--shadow-soft);
+    }
+    .modal,
+    .announcement-modal { border-radius: 26px; }
+    .modal-header,
+    .map-select-header,
+    .image-batch-preview-header {
+      background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,247,237,.9));
+      border-bottom: 1px solid rgba(229,231,235,.85);
+    }
+    .modal-header h3,
+    .map-select-header h4 { color: #111827; }
+    .modal-close-btn,
+    .map-select-header button,
+    .image-batch-preview-header button,
+    .close-preview {
+      background: rgba(255,255,255,.82) !important;
+      color: #64748b !important;
+      border: 1px solid rgba(229,231,235,.9) !important;
+      box-shadow: 0 5px 16px rgba(15,23,42,.08);
+    }
+    .modal-close-btn:hover,
+    .map-select-header button:hover,
+    .image-batch-preview-header button:hover,
+    .close-preview:hover {
+      color: #ef4444 !important;
+      transform: scale(1.05);
+    }
+
+    .modal-body input[type="text"],
+    .modal-body input[type="number"],
+    .modal-body select,
+    .modal-body textarea,
+    .modal-body input[type="file"],
+    .readonly-field {
+      background: #f8fafc;
+      border: 1px solid rgba(203,213,225,.95);
+      border-radius: 14px;
+    }
+    .modal-body input:focus,
+    .modal-body select:focus,
+    .modal-body textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px var(--brand-ring);
+    }
+
+    .toolbar-row {
+      background: #f8fafc;
+      border: 1px solid rgba(229,231,235,.9);
+      padding: 10px;
+      border-radius: 18px;
+    }
+    .sort-controls-compact select,
+    .product-zoom-slider,
+    .select-toolbar .select-btn {
+      background: #fff;
+      border: 1px solid rgba(229,231,235,.9);
+    }
+    .select-btn.active,
+    .select-btn.select-all-active { box-shadow: 0 8px 18px rgba(249,115,22,.18); }
+
+    .product-grid { gap: 12px; padding: 4px; }
+    .product-card {
+      background: #fff;
+      border: 1px solid rgba(229,231,235,.92);
+      border-radius: 18px;
+      padding: 10px;
+      box-shadow: var(--shadow-card);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+      overflow: hidden;
+    }
+    .product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(15,23,42,.12);
+      border-color: rgba(249,115,22,.45);
+    }
+    .product-card.selected {
+      background: linear-gradient(180deg, #fff7ed, #ffffff);
+      border: 2px solid var(--brand);
+    }
+    .product-card.starred {
+      background: linear-gradient(180deg, #fffbeb, #ffffff);
+      border: 2px solid #f59e0b;
+    }
+    .product-card .img-container {
+      height: 108px;
+      background: linear-gradient(135deg, #f8fafc, #eef2ff);
+      border: 1px solid rgba(229,231,235,.86);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .product-card img { transition: transform .18s ease; }
+    .product-card:hover img { transform: scale(1.03); }
+    .product-card .prod-name {
+      font-size: 13px;
+      line-height: 1.35;
+      color: #111827;
+      margin-top: 8px;
+    }
+    .product-card .star-badge {
+      top: 8px;
+      right: 8px;
+      background: #fff7ed;
+      box-shadow: 0 4px 14px rgba(245,158,11,.24);
+    }
+    .product-card .actions {
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .product-card .actions button {
+      background: #f8fafc;
+      border: 1px solid rgba(229,231,235,.95);
+      box-shadow: 0 4px 10px rgba(15,23,42,.05);
+      border-radius: 12px;
+      min-width: 34px;
+      height: 34px;
+      padding: 4px 7px;
+    }
+    .product-card .actions button:hover {
+      background: #fff7ed;
+      border-color: rgba(249,115,22,.42);
+      transform: translateY(-1px) scale(1.05);
+    }
+
+    .batch-action-bar {
+      left: 50%;
+      right: auto;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(94vw, 760px);
+      border-radius: 999px;
+      border: 1px solid rgba(229,231,235,.9);
+      box-shadow: 0 18px 48px rgba(15,23,42,.18);
+      backdrop-filter: blur(14px);
+    }
+    .batch-action-bar button { box-shadow: 0 6px 16px rgba(15,23,42,.08); }
+
+    .toast {
+      bottom: 34px;
+      background: rgba(17,24,39,.9);
+      box-shadow: 0 16px 42px rgba(15,23,42,.24);
+      border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(10px);
+    }
+
+    .import-banner {
+      background: linear-gradient(135deg, #fff7ed, #fffbeb);
+      border: 1px solid rgba(249,115,22,.28);
+      color: #9a3412;
+      box-shadow: 0 8px 20px rgba(249,115,22,.08);
+    }
+
+    .detail-table td { border-bottom: 1px solid rgba(229,231,235,.9); }
+    #detailImage {
+      border: 1px solid rgba(229,231,235,.9);
+      box-shadow: var(--shadow-card);
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 0; }
+      .app-container { border-radius: 0; max-height: none; }
+      .nav-bar { padding: 12px; }
+      .nav-bar .title { font-size: 17px; }
+      .content { padding: 10px; }
+      .toolbar { border-radius: 18px; }
+      .toolbar button, .toolbar select { padding: 8px 11px; }
+      .batch-action-bar { width: calc(100vw - 20px); border-radius: 22px; bottom: 10px; }
+      .modal { width: 94%; border-radius: 22px; }
+    }
+
+  
+
+    /* 商品陈列区修复：避免美化后卡片被压扁，只显示图片切片 */
+    .product-grid {
+      align-items: start !important;
+      grid-auto-rows: minmax(204px, auto) !important;
+      overflow-y: auto !important;
+    }
+    .product-card {
+      min-height: 192px !important;
+      height: auto !important;
+      overflow: visible !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+    }
+    .product-card .img-container {
+      height: 96px !important;
+      min-height: 96px !important;
+      flex: 0 0 96px !important;
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+    }
+    .product-card .img-container img,
+    .product-card img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
+    .product-card .prod-name {
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      min-height: 34px !important;
+      overflow: hidden !important;
+      text-align: center !important;
+      line-height: 1.45 !important;
+      margin-top: 9px !important;
+    }
+    .product-card.search-hit {
+      border-color: #f97316 !important;
+      box-shadow: 0 0 0 2px rgba(249,115,22,.22), var(--shadow-card) !important;
+      background: linear-gradient(180deg, #fff7ed, #ffffff) !important;
+      min-height: 216px !important;
+      padding-bottom: 12px !important;
+    }
+    .search-mark {
+      background: #fde047;
+      color: #111827;
+      border-radius: 4px;
+      padding: 0 2px;
+      font-weight: 800;
+    }
+    .prod-meta {
+      margin-top: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #4b5563;
+      text-align: left;
+    }
+    .prod-meta-line {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      word-break: break-word;
+      padding: 4px 6px;
+      border-radius: 7px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(249,115,22,.16);
+    }
+    .prod-meta-label {
+      color: #6b7280;
+      font-weight: 700;
+    }
+    .product-card .actions {
+      display: flex !important;
+      flex: 0 0 auto !important;
+      justify-content: center !important;
+      align-items: center !important;
+      margin-top: auto !important;
+      padding-top: 10px !important;
+    }
+    .product-grid.virtualized {
+      display: block !important;
+      position: relative !important;
+      overflow-y: auto !important;
+      contain: strict;
+    }
+    .virtual-grid-spacer {
+      position: relative;
+      width: 100%;
+    }
+    .virtual-grid-window {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      gap: 12px;
+      align-items: start;
+      will-change: transform;
+    }
+    .product-grid.virtualized .product-card {
+      height: calc(var(--virtual-row-height) - 12px) !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+    .product-grid.virtualized .product-card.search-hit {
+      min-height: 0 !important;
+    }
+    .canvas-wrapper { position: relative; }
+    .mini-map-canvas {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 170px;
+      height: 120px;
+      border: 1px solid rgba(249,115,22,.45);
+      border-radius: 10px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 10px 28px rgba(15,23,42,.16);
+      cursor: crosshair;
+      z-index: 8;
+    }
+    .add-area-hint {
+      display: none;
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.86);
+      color: #fff;
+      font-size: 13px;
+      pointer-events: none;
+      z-index: 9;
+    }
+    .add-area-hint.show { display: block; }
+    @media (max-width: 640px) {
+      .mini-map-canvas {
+        width: 128px;
+        height: 92px;
+        right: 8px;
+        bottom: 8px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="announcement-overlay" id="announcementOverlay">
+  <div class="announcement-modal">
+    <h2>📢 产品使用说明</h2>
+    <p><strong>类型：</strong>开源前端演示项目</p>
+    <p><strong>版本：</strong>0.92 (图标悬停+关闭修复)</p>
+    <p><strong>更新内容：</strong>编辑模式下商品操作按钮改为纯图标(✏️🗑️📦)，鼠标悬停显示文字提示；修复所有弹窗“×”关闭按钮无效的问题；完整保留批量移动/删除、区域多选、样式复制、按规格识别表头等功能。</p>
+    <div class="version">区域导航 Area Navigator V0.92</div>
+    <div class="announcement-buttons">
+      <button class="btn-acknowledge" id="btnAcknowledge">我已知悉</button>
+      <button class="btn-close-announce" id="btnCloseAnnounce">✕ 关闭</button>
+    </div>
+  </div>
+</div>
+<div class="app-container">
+  <div class="nav-bar">
+    <span class="title">🏢 区域导航</span>
+    <div class="nav-actions">
+      <div class="zoom-slider-container"><span>🔍</span><input type="range" id="zoomSlider" min="0.2" max="5" step="0.05" value="1"><span>🔎</span></div>
+      <div class="undo-redo-group"><button id="undoBtn" title="撤回 (Ctrl+Z)">↩️</button><button id="redoBtn" title="复原 (Ctrl+Y)">↪️</button><button id="clearHistoryBtn" title="清空历史记录">🧹</button></div>
+      <button class="icon-btn" id="orientationBtn">🔄</button>
+      <button class="icon-btn" id="desktopModeBtn">💻</button>
+      <button class="mode-badge" id="modeSwitchBtn">👤 游客</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="import-banner" id="importBanner">📂 没有找到卖场数据，请导入备份文件 <button id="bannerImportBtn">📥 导入</button></div>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn">🔍</button></div>
+    <div class="canvas-wrapper"><canvas id="mapCanvas"></canvas><canvas id="miniMapCanvas" class="mini-map-canvas" title="点击小地图跳转视图"></canvas><div id="addAreaHint" class="add-area-hint">拖拽画布拉出新区域</div></div>
+    <div class="toolbar" id="mainToolbar">
+      <button class="export-btn" id="exportBtn">📤 导出</button>
+      <button class="import-btn" id="importBtn">📥 导入</button>
+      <button class="reset-view-btn" id="resetViewBtn">🔄 重置视图</button>
+      <button class="snap-btn" id="snapBtn">📐 吸附开</button>
+      <button class="primary-btn" id="addAreaBtn">➕ 添加区域</button>
+      <button class="area-multi-select-btn" id="areaMultiSelectBtn" style="display: none;">🔘 区域多选</button>
+      <button class="area-copy-btn" id="areaCopyBtn" style="display: none;">📋 复制样式</button>
+      <select id="batchLockSelect" class="batch-select" style="display: none;">
+        <option value="">🔓 批量操作</option>
+        <option value="unlockSelected">🔓 批量解锁（选中）</option>
+        <option value="unlockAll">🔓 全部解锁</option>
+        <option value="lockSelected">🔒 批量上锁（选中）</option>
+        <option value="lockAll">🔒 全部上锁</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div id="alignHint" class="align-hint" style="display: none;"></div>
+<div id="masterTip" class="master-tip" style="display: none;"></div>
+
+<!-- 区域操作菜单 -->
+<div class="modal-overlay" id="areaMenuModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="areaMenuTitle"></h3>
+      <button class="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align: center; margin-bottom: 15px;"><div id="areaMenuCode" style="font-size: 12px; color: #666;">编号：---</div></div>
+      <div class="area-menu-btns">
+        <button id="editAreaBtn">✏️ 编辑区域</button>
+        <button id="editProductsBtn">📦 编辑商品</button>
+        <button id="batchImportBtn">📥 批量导入商品</button>
+        <button id="batchImageFromAreaBtn">📸 批量导入图片</button>
+        <button id="lockAreaBtn">🔒 锁定区域</button>
+        <button id="unlockAreaBtn" style="display:none;">🔓 解锁区域</button>
+      </div>
+      <button class="btn-secondary" id="closeAreaMenuBtn">关闭</button>
+    </div>
+  </div>
+</div>
+<!-- 批量导入商品弹窗 -->
+<div class="modal-overlay" id="batchImportModal">
+  <div class="modal">
+    <div class="modal-header"><h3>批量导入商品</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-body">
+      <label>📎 选择Excel文件</label>
+      <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" />
+      <div class="excel-hint">支持格式：.xlsx、.xls、.csv</div>
+      <div class="excel-hint">系统将自动查找包含“规格”的行作为表头，请确认下方字段映射</div>
+      <div class="field-mapping" id="fieldMapping" style="display:none;">
+        <strong>🔧 请选择对应的列：</strong>
+        <div class="field-mapping-row"><span>商品名称：</span><select id="mapNameCol"></select></div>
+        <div class="field-mapping-row"><span>条码：</span><select id="mapBarcodeCol"></select></div>
+        <div class="field-mapping-row"><span>规格：</span><select id="mapSpecCol"></select></div>
+        <div class="field-mapping-row"><span>单位：</span><select id="mapUnitCol"></select></div>
+        <div class="field-mapping-row"><span>库存数量：</span><select id="mapStockCol"></select></div>
+      </div>
+      <div class="preview-area" id="batchPreview" style="display:none;"></div>
+      <div class="modal-buttons"><button class="btn-secondary" id="cancelBatchBtn">取消</button><button class="btn-info" id="previewBatchBtn">👁️ 预览</button><button class="btn-primary" id="confirmBatchBtn">✅ 确认导入</button></div>
+    </div>
+  </div>
+</div>
+<!-- 批量导入图片弹窗 -->
+<div class="modal-overlay" id="batchImageModal">
+  <div class="modal">
+    <div class="modal-header"><h3>批量导入图片</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-body">
+      <label>📸 选择图片文件（可多选）</label>
+      <input type="file" id="imageFileInput" accept="image/*" multiple />
+      <div class="excel-hint">图片文件名需要与商品条码匹配（不含扩展名）</div>
+      <div class="progress-bar" id="imageProgressBar" style="display:none;"><div class="progress-fill" id="imageProgressFill"></div></div>
+      <div class="modal-buttons"><button class="btn-secondary" id="cancelImageBtn">取消</button><button class="btn-info" id="previewImageBtn">👁️ 预览匹配</button><button class="btn-primary" id="confirmImageBtn">✅ 确认导入图片</button></div>
+    </div>
+  </div>
+</div>
+<!-- 编辑区域信息弹窗 -->
+<div class="modal-overlay" id="editAreaModal">
+  <div class="modal">
+    <div class="modal-header"><h3>编辑区域信息</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-body">
+      <div class="style-copy-area"><label>🎨 样式快速操作</label><div class="style-copy-buttons"><button class="btn-info" id="copyStyleBtn">📋 复制样式</button><button class="btn-success" id="pasteStyleBtn">📎 粘贴样式</button></div></div>
+      <label>区域编码</label><div class="readonly-field" id="areaCodeDisplay">-</div>
+      <label>区域名称</label><input type="text" id="editAreaName" />
+      <label>背景颜色</label><input type="color" id="editAreaColor" />
+      <label>文字颜色</label><input type="color" id="editTextColor" value="#ffffff" />
+      <label>文字大小 (px)</label><input type="range" id="editFontSize" min="10" max="24" step="1" value="14" style="width:100%;"><span id="fontSizeValue">14px</span>
+      <label>文字方向</label>
+      <div class="text-direction-preview"><div class="direction-option" data-dir="horizontal"><div>← 水平 →</div></div><div class="direction-option" data-dir="vertical"><div>↑ 垂直 ↓</div></div><div class="direction-option" data-dir="rotate90"><div>↻ 旋转90°</div></div><div class="direction-option" data-dir="rotate270"><div>↺ 旋转270°</div></div></div>
+      <input type="hidden" id="editTextDirection" value="horizontal">
+      <label>区域形状</label><select id="editAreaShape"><option value="rect">方形</option><option value="roundRect">圆角矩形</option><option value="circle">圆形/椭圆形</option><option value="diamond">菱形</option></select>
+      <label>宽度 (px)</label><input type="number" id="editAreaWidth" min="30" max="600" step="1" />
+      <label>高度 (px)</label><input type="number" id="editAreaHeight" min="30" max="600" step="1" />
+      <div class="modal-buttons"><button class="btn-secondary" id="cancelEditAreaBtn">取消</button><button class="btn-primary" id="saveAreaInfoBtn">保存</button></div>
+      <button class="btn-copy-area" id="copyAreaBtn">📋 复制整个区域</button>
+      <button class="btn-delete-area" id="deleteAreaBtn">🗑️ 删除区域</button>
+    </div>
+  </div>
+</div>
+<!-- 商品陈列弹窗 -->
+<div class="modal-overlay" id="productsModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="productsTitle"></h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-body" id="productsModalBody">
+      <div class="toolbar-row">
+        <div class="sort-controls-compact"><select id="sortFieldSelect"><option value="lastModified">修改时间</option><option value="name">名称</option><option value="stock">库存数量</option></select><select id="sortOrderSelect"><option value="asc">升序</option><option value="desc">降序</option></select></div>
+        <div class="product-zoom-slider"><span>🔍</span><input type="range" id="productZoomSlider" min="1" max="6" step="1" value="2"><span>列</span></div>
+        <div class="select-toolbar"><button class="select-btn" id="selectModeBtn">☑️ 多选</button><button class="select-btn" id="selectAllBtn">✅ 全选</button></div>
+      </div>
+      <div class="product-grid-container"><div class="product-grid" id="productGrid"></div><div class="scroll-buttons"><button id="scrollToTopBtn" title="回到顶部">⬆️ 顶部</button><button id="scrollToBottomBtn" title="到底部">⬇️ 底部</button></div></div>
+      <div id="editActionButtons" class="action-buttons" style="margin-top: 8px; display: none;"><button class="btn-primary" id="addProductBtn">➕ 添加商品</button><button class="btn-info" id="batchImportFromProductsBtn">📥 批量导入商品</button><button class="btn-success" id="batchImageFromProductsBtn">📸 批量导入图片</button></div>
+      <button class="btn-secondary" id="closeProductsBtn" style="margin-top:15px; width:100%;">关闭</button>
+    </div>
+  </div>
+</div>
+<!-- 商品编辑弹窗 -->
+<div class="modal-overlay" id="productEditModal"><div class="modal"><div class="modal-header"><h3 id="productEditTitle">编辑商品</h3><button class="modal-close-btn">&times;</button></div><div class="modal-body"><label>商品名称 *</label><input type="text" id="productName" /><label>条码</label><input type="text" id="productBarcode" /><label>规格</label><input type="text" id="productSpec" /><label>单位</label><input type="text" id="productUnit" /><label>库存数量</label><input type="number" id="productStock" step="1" value="0" /><label>商品图片</label><input type="file" id="productImage" accept="image/*" /><label>最后修改时间</label><div class="readonly-field" id="productLastModified">-</div><div class="modal-buttons"><button class="btn-secondary" id="cancelProductBtn">取消</button><button class="btn-primary" id="saveProductBtn">保存</button></div></div></div></div>
+<!-- 商品详情弹窗 -->
+<div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn">▶</button></div><img id="detailImage" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
+<!-- 地图选择窗口 -->
+<div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4>📌 选择目标区域</h4><button id="closeMapSelectBtn">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
+<!-- 大图预览 -->
+<div class="image-preview-overlay" id="imagePreviewOverlay"><button class="close-preview" id="closePreviewBtn">&times;</button><img id="previewImage" src="" /></div>
+<!-- 商品批量操作栏 -->
+<div id="batchActionBar" class="batch-action-bar" style="display: none;">
+  <span id="selectedCount">已选择 0 个商品</span>
+  <button class="btn-star-collect" id="batchStarBtn" style="display: none;">⭐ 收藏</button>
+  <button class="btn-download-img" id="batchDownloadImgBtn" style="display: none;">📸 下载图片</button>
+  <button class="btn-download-csv" id="batchDownloadCsvBtn" style="display: none;">📄 下载商品页</button>
+  <button class="btn-move" id="batchMoveBtn" style="display: none;">📦 批量移动</button>
+  <button class="btn-delete" id="batchDeleteBtn" style="display: none;">🗑️ 批量删除</button>
+  <button class="btn-cancel" id="batchCancelBtn">取消</button>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<!-- 使用可用的 JSZip CDN -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

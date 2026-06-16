@@ -1,0 +1,9 @@
+*.json
+*.csv
+*.xlsx
+*.xls
+.env
+.env.*
+node_modules/
+.DS_Store
+Thumbs.db
