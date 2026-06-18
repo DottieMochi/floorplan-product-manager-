@@ -4,6 +4,12 @@
 
 > A client-side-only demo for navigating display areas and managing products on a zoomable canvas. All data lives in the browser's IndexedDB — nothing is sent to any server.
 
+## 🖼️ 界面预览
+
+| 浅色 Light | 深色 Dark |
+|:---:|:---:|
+| ![浅色界面预览](docs/preview-light.svg) | ![深色界面预览](docs/preview-dark.svg) |
+
 ## ✨ 功能
 
 - **画布地图**：缩放、平移、吸附对齐、小地图（mini-map）快速跳转
