@@ -7,9 +7,15 @@ export const ROLE_KEYS = {
 };
 
 export const ROLE_LABELS = {
-  guest: '👤 游客',
-  staff: '🧰 工作人员',
-  designer: '🎨 设计者'
+  guest: '游客',
+  staff: '工作人员',
+  designer: '设计者'
+};
+
+export const ROLE_ICONS = {
+  guest: 'ti-user',
+  staff: 'ti-tool',
+  designer: 'ti-palette'
 };
 
 // 角色密码（可选，软门槛）。

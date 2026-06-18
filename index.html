@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>区域导航 · Area Navigator V0.92</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,33 +17,33 @@
     <div class="version">区域导航 Area Navigator V0.92</div>
     <div class="announcement-buttons">
       <button class="btn-acknowledge" id="btnAcknowledge">我已知悉</button>
-      <button class="btn-close-announce" id="btnCloseAnnounce">✕ 关闭</button>
+      <button class="btn-close-announce" id="btnCloseAnnounce"><i class="ti ti-x" aria-hidden="true"></i> 关闭</button>
     </div>
   </div>
 </div>
 <div class="app-container">
   <div class="nav-bar">
-    <span class="title">🏢 区域导航</span>
+    <span class="title"><i class="ti ti-building-store" aria-hidden="true"></i> 区域导航</span>
     <div class="nav-actions">
-      <div class="zoom-slider-container"><span aria-hidden="true">🔍</span><input type="range" id="zoomSlider" min="0.2" max="5" step="0.05" value="1" aria-label="地图缩放"><span aria-hidden="true">🔎</span></div>
-      <div class="undo-redo-group"><button id="undoBtn" title="撤回 (Ctrl+Z)" aria-label="撤回">↩️</button><button id="redoBtn" title="复原 (Ctrl+Y)" aria-label="复原">↪️</button><button id="clearHistoryBtn" title="清空历史记录" aria-label="清空历史记录">🧹</button></div>
-      <button class="icon-btn" id="orientationBtn" aria-label="切换横竖屏方向">🔄</button>
-      <button class="icon-btn" id="desktopModeBtn" aria-label="切换桌面/手机视图">💻</button>
-      <button class="mode-badge" id="modeSwitchBtn" aria-label="切换角色身份">👤 游客</button>
+      <div class="zoom-slider-container"><span aria-hidden="true"><i class="ti ti-zoom-out"></i></span><input type="range" id="zoomSlider" min="0.2" max="5" step="0.05" value="1" aria-label="地图缩放"><span aria-hidden="true"><i class="ti ti-zoom-in"></i></span></div>
+      <div class="undo-redo-group"><button id="undoBtn" title="撤回 (Ctrl+Z)" aria-label="撤回"><i class="ti ti-arrow-back-up" aria-hidden="true"></i></button><button id="redoBtn" title="复原 (Ctrl+Y)" aria-label="复原"><i class="ti ti-arrow-forward-up" aria-hidden="true"></i></button><button id="clearHistoryBtn" title="清空历史记录" aria-label="清空历史记录"><i class="ti ti-eraser" aria-hidden="true"></i></button></div>
+      <button class="icon-btn" id="orientationBtn" aria-label="切换横竖屏方向"><i class="ti ti-rotate" aria-hidden="true"></i></button>
+      <button class="icon-btn" id="desktopModeBtn" aria-label="切换桌面/手机视图"><i class="ti ti-device-desktop" aria-hidden="true"></i></button>
+      <button class="mode-badge" id="modeSwitchBtn" aria-label="切换角色身份"><i class="ti ti-user" aria-hidden="true"></i> 游客</button>
     </div>
   </div>
   <div class="content">
-    <div class="import-banner" id="importBanner">📂 没有找到卖场数据，请导入备份文件 <button id="bannerImportBtn">📥 导入</button></div>
-    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." aria-label="搜索商品名或条码" list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn" aria-label="搜索">🔍</button></div>
+    <div class="import-banner" id="importBanner"><i class="ti ti-folder-open" aria-hidden="true"></i> 没有找到卖场数据，请导入备份文件 <button id="bannerImportBtn"><i class="ti ti-download" aria-hidden="true"></i> 导入</button></div>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." aria-label="搜索商品名或条码" list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn" aria-label="搜索"><i class="ti ti-search" aria-hidden="true"></i></button></div>
     <div class="canvas-wrapper"><canvas id="mapCanvas" role="img" aria-label="可缩放、可平移的卖场区域地图"></canvas><canvas id="miniMapCanvas" class="mini-map-canvas" title="点击小地图跳转视图" aria-label="小地图，点击可跳转视图"></canvas><div id="addAreaHint" class="add-area-hint">拖拽画布拉出新区域</div></div>
     <div class="toolbar" id="mainToolbar">
-      <button class="export-btn" id="exportBtn">📤 导出</button>
-      <button class="import-btn" id="importBtn">📥 导入</button>
-      <button class="reset-view-btn" id="resetViewBtn">🔄 重置视图</button>
-      <button class="snap-btn" id="snapBtn">📐 吸附开</button>
-      <button class="primary-btn" id="addAreaBtn">➕ 添加区域</button>
-      <button class="area-multi-select-btn" id="areaMultiSelectBtn" style="display: none;">🔘 区域多选</button>
-      <button class="area-copy-btn" id="areaCopyBtn" style="display: none;">📋 复制样式</button>
+      <button class="export-btn" id="exportBtn"><i class="ti ti-upload" aria-hidden="true"></i> 导出</button>
+      <button class="import-btn" id="importBtn"><i class="ti ti-download" aria-hidden="true"></i> 导入</button>
+      <button class="reset-view-btn" id="resetViewBtn"><i class="ti ti-refresh" aria-hidden="true"></i> 重置视图</button>
+      <button class="snap-btn" id="snapBtn"><i class="ti ti-magnet" aria-hidden="true"></i> 吸附开</button>
+      <button class="primary-btn" id="addAreaBtn"><i class="ti ti-plus" aria-hidden="true"></i> 添加区域</button>
+      <button class="area-multi-select-btn" id="areaMultiSelectBtn" style="display: none;"><i class="ti ti-checkbox" aria-hidden="true"></i> 区域多选</button>
+      <button class="area-copy-btn" id="areaCopyBtn" style="display: none;"><i class="ti ti-copy" aria-hidden="true"></i> 复制样式</button>
       <select id="batchLockSelect" class="batch-select" style="display: none;">
         <option value="">🔓 批量操作</option>
         <option value="unlockSelected">🔓 批量解锁（选中）</option>
@@ -66,12 +67,12 @@
     <div class="modal-body">
       <div style="text-align: center; margin-bottom: 15px;"><div id="areaMenuCode" style="font-size: 12px; color: #666;">编号：---</div></div>
       <div class="area-menu-btns">
-        <button id="editAreaBtn">✏️ 编辑区域</button>
-        <button id="editProductsBtn">📦 编辑商品</button>
-        <button id="batchImportBtn">📥 批量导入商品</button>
-        <button id="batchImageFromAreaBtn">📸 批量导入图片</button>
-        <button id="lockAreaBtn">🔒 锁定区域</button>
-        <button id="unlockAreaBtn" style="display:none;">🔓 解锁区域</button>
+        <button id="editAreaBtn"><i class="ti ti-edit" aria-hidden="true"></i> 编辑区域</button>
+        <button id="editProductsBtn"><i class="ti ti-package" aria-hidden="true"></i> 编辑商品</button>
+        <button id="batchImportBtn"><i class="ti ti-download" aria-hidden="true"></i> 批量导入商品</button>
+        <button id="batchImageFromAreaBtn"><i class="ti ti-camera" aria-hidden="true"></i> 批量导入图片</button>
+        <button id="lockAreaBtn"><i class="ti ti-lock" aria-hidden="true"></i> 锁定区域</button>
+        <button id="unlockAreaBtn" style="display:none;"><i class="ti ti-lock-open" aria-hidden="true"></i> 解锁区域</button>
       </div>
       <button class="btn-secondary" id="closeAreaMenuBtn">关闭</button>
     </div>
@@ -95,7 +96,7 @@
         <div class="field-mapping-row"><span>库存数量：</span><select id="mapStockCol"></select></div>
       </div>
       <div class="preview-area" id="batchPreview" style="display:none;"></div>
-      <div class="modal-buttons"><button class="btn-secondary" id="cancelBatchBtn">取消</button><button class="btn-info" id="previewBatchBtn">👁️ 预览</button><button class="btn-primary" id="confirmBatchBtn">✅ 确认导入</button></div>
+      <div class="modal-buttons"><button class="btn-secondary" id="cancelBatchBtn">取消</button><button class="btn-info" id="previewBatchBtn"><i class="ti ti-eye" aria-hidden="true"></i> 预览</button><button class="btn-primary" id="confirmBatchBtn"><i class="ti ti-check" aria-hidden="true"></i> 确认导入</button></div>
     </div>
   </div>
 </div>
@@ -108,7 +109,7 @@
       <input type="file" id="imageFileInput" accept="image/*" multiple />
       <div class="excel-hint">图片文件名需要与商品条码匹配（不含扩展名）</div>
       <div class="progress-bar" id="imageProgressBar" style="display:none;"><div class="progress-fill" id="imageProgressFill"></div></div>
-      <div class="modal-buttons"><button class="btn-secondary" id="cancelImageBtn">取消</button><button class="btn-info" id="previewImageBtn">👁️ 预览匹配</button><button class="btn-primary" id="confirmImageBtn">✅ 确认导入图片</button></div>
+      <div class="modal-buttons"><button class="btn-secondary" id="cancelImageBtn">取消</button><button class="btn-info" id="previewImageBtn"><i class="ti ti-eye" aria-hidden="true"></i> 预览匹配</button><button class="btn-primary" id="confirmImageBtn"><i class="ti ti-check" aria-hidden="true"></i> 确认导入图片</button></div>
     </div>
   </div>
 </div>
@@ -117,7 +118,7 @@
   <div class="modal">
     <div class="modal-header"><h3>编辑区域信息</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
     <div class="modal-body">
-      <div class="style-copy-area"><label>🎨 样式快速操作</label><div class="style-copy-buttons"><button class="btn-info" id="copyStyleBtn">📋 复制样式</button><button class="btn-success" id="pasteStyleBtn">📎 粘贴样式</button></div></div>
+      <div class="style-copy-area"><label>🎨 样式快速操作</label><div class="style-copy-buttons"><button class="btn-info" id="copyStyleBtn"><i class="ti ti-copy" aria-hidden="true"></i> 复制样式</button><button class="btn-success" id="pasteStyleBtn"><i class="ti ti-clipboard" aria-hidden="true"></i> 粘贴样式</button></div></div>
       <label>区域编码</label><div class="readonly-field" id="areaCodeDisplay">-</div>
       <label>区域名称</label><input type="text" id="editAreaName" />
       <label>背景颜色</label><input type="color" id="editAreaColor" />
@@ -130,8 +131,8 @@
       <label>宽度 (px)</label><input type="number" id="editAreaWidth" min="30" max="600" step="1" />
       <label>高度 (px)</label><input type="number" id="editAreaHeight" min="30" max="600" step="1" />
       <div class="modal-buttons"><button class="btn-secondary" id="cancelEditAreaBtn">取消</button><button class="btn-primary" id="saveAreaInfoBtn">保存</button></div>
-      <button class="btn-copy-area" id="copyAreaBtn">📋 复制整个区域</button>
-      <button class="btn-delete-area" id="deleteAreaBtn">🗑️ 删除区域</button>
+      <button class="btn-copy-area" id="copyAreaBtn"><i class="ti ti-copy" aria-hidden="true"></i> 复制整个区域</button>
+      <button class="btn-delete-area" id="deleteAreaBtn"><i class="ti ti-trash" aria-hidden="true"></i> 删除区域</button>
     </div>
   </div>
 </div>
@@ -142,11 +143,11 @@
     <div class="modal-body" id="productsModalBody">
       <div class="toolbar-row">
         <div class="sort-controls-compact"><select id="sortFieldSelect"><option value="lastModified">修改时间</option><option value="name">名称</option><option value="stock">库存数量</option></select><select id="sortOrderSelect"><option value="asc">升序</option><option value="desc">降序</option></select></div>
-        <div class="product-zoom-slider"><span aria-hidden="true">🔍</span><input type="range" id="productZoomSlider" min="1" max="6" step="1" value="2" aria-label="每行显示的商品列数"><span>列</span></div>
-        <div class="select-toolbar"><button class="select-btn" id="selectModeBtn">☑️ 多选</button><button class="select-btn" id="selectAllBtn">✅ 全选</button></div>
+        <div class="product-zoom-slider"><span aria-hidden="true"><i class="ti ti-layout-grid"></i></span><input type="range" id="productZoomSlider" min="1" max="6" step="1" value="2" aria-label="每行显示的商品列数"><span>列</span></div>
+        <div class="select-toolbar"><button class="select-btn" id="selectModeBtn"><i class="ti ti-checkbox" aria-hidden="true"></i> 多选</button><button class="select-btn" id="selectAllBtn"><i class="ti ti-checks" aria-hidden="true"></i> 全选</button></div>
       </div>
-      <div class="product-grid-container"><div class="product-grid" id="productGrid"></div><div class="scroll-buttons"><button id="scrollToTopBtn" title="回到顶部">⬆️ 顶部</button><button id="scrollToBottomBtn" title="到底部">⬇️ 底部</button></div></div>
-      <div id="editActionButtons" class="action-buttons" style="margin-top: 8px; display: none;"><button class="btn-primary" id="addProductBtn">➕ 添加商品</button><button class="btn-info" id="batchImportFromProductsBtn">📥 批量导入商品</button><button class="btn-success" id="batchImageFromProductsBtn">📸 批量导入图片</button></div>
+      <div class="product-grid-container"><div class="product-grid" id="productGrid"></div><div class="scroll-buttons"><button id="scrollToTopBtn" title="回到顶部"><i class="ti ti-arrow-up" aria-hidden="true"></i> 顶部</button><button id="scrollToBottomBtn" title="到底部"><i class="ti ti-arrow-down" aria-hidden="true"></i> 底部</button></div></div>
+      <div id="editActionButtons" class="action-buttons" style="margin-top: 8px; display: none;"><button class="btn-primary" id="addProductBtn"><i class="ti ti-plus" aria-hidden="true"></i> 添加商品</button><button class="btn-info" id="batchImportFromProductsBtn"><i class="ti ti-download" aria-hidden="true"></i> 批量导入商品</button><button class="btn-success" id="batchImageFromProductsBtn"><i class="ti ti-camera" aria-hidden="true"></i> 批量导入图片</button></div>
       <button class="btn-secondary" id="closeProductsBtn" style="margin-top:15px; width:100%;">关闭</button>
     </div>
   </div>
@@ -156,17 +157,17 @@
 <!-- 商品详情弹窗 -->
 <div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn" aria-label="上一个商品">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn" aria-label="下一个商品">▶</button></div><img id="detailImage" alt="商品图片" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
 <!-- 地图选择窗口 -->
-<div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4>📌 选择目标区域</h4><button id="closeMapSelectBtn" aria-label="关闭">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
+<div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4><i class="ti ti-map-pin" aria-hidden="true"></i> 选择目标区域</h4><button id="closeMapSelectBtn" aria-label="关闭">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
 <!-- 大图预览 -->
 <div class="image-preview-overlay" id="imagePreviewOverlay"><button class="close-preview" id="closePreviewBtn" aria-label="关闭">&times;</button><img id="previewImage" src="" alt="商品大图预览" /></div>
 <!-- 商品批量操作栏 -->
 <div id="batchActionBar" class="batch-action-bar" style="display: none;">
   <span id="selectedCount">已选择 0 个商品</span>
-  <button class="btn-star-collect" id="batchStarBtn" style="display: none;">⭐ 收藏</button>
-  <button class="btn-download-img" id="batchDownloadImgBtn" style="display: none;">📸 下载图片</button>
-  <button class="btn-download-csv" id="batchDownloadCsvBtn" style="display: none;">📄 下载商品页</button>
-  <button class="btn-move" id="batchMoveBtn" style="display: none;">📦 批量移动</button>
-  <button class="btn-delete" id="batchDeleteBtn" style="display: none;">🗑️ 批量删除</button>
+  <button class="btn-star-collect" id="batchStarBtn" style="display: none;"><i class="ti ti-star" aria-hidden="true"></i> 收藏</button>
+  <button class="btn-download-img" id="batchDownloadImgBtn" style="display: none;"><i class="ti ti-camera" aria-hidden="true"></i> 下载图片</button>
+  <button class="btn-download-csv" id="batchDownloadCsvBtn" style="display: none;"><i class="ti ti-file-text" aria-hidden="true"></i> 下载商品页</button>
+  <button class="btn-move" id="batchMoveBtn" style="display: none;"><i class="ti ti-package" aria-hidden="true"></i> 批量移动</button>
+  <button class="btn-delete" id="batchDeleteBtn" style="display: none;"><i class="ti ti-trash" aria-hidden="true"></i> 批量删除</button>
   <button class="btn-cancel" id="batchCancelBtn">取消</button>
 </div>
 <div class="toast" id="toast"></div>

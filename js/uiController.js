@@ -1,6 +1,6 @@
 // js/uiController.js
 import {
-  store, ROLE_KEYS, ROLE_LABELS, ROLE_PASSWORDS,
+  store, ROLE_KEYS, ROLE_LABELS, ROLE_ICONS, ROLE_PASSWORDS,
   hasPermission, setCurrentUserRole
 } from './store.js';
 import { drawMap, scheduleResetView } from './canvasManager.js';
@@ -132,7 +132,8 @@ function openProductsForArea(area) {
 
 export function refreshRoleUI() {
   const label = ROLE_LABELS[store.currentUserRole] || ROLE_LABELS.guest;
-  if (modeSwitchBtn) modeSwitchBtn.textContent = label;
+  const roleIcon = ROLE_ICONS[store.currentUserRole] || ROLE_ICONS.guest;
+  if (modeSwitchBtn) modeSwitchBtn.innerHTML = `<i class="ti ${roleIcon}" aria-hidden="true"></i> ${label}`;
 
   store.currentMode = store.currentUserRole === ROLE_KEYS.DESIGNER ? 'edit' : 'browse';
   if (store.currentUserRole !== ROLE_KEYS.DESIGNER) {
@@ -189,7 +190,7 @@ function chooseRole() {
   setCurrentUserRole(role);
   refreshRoleUI();
   refreshCurrentProductGrid();
-  showToast(`已切换为${ROLE_LABELS[role].replace(/^[^\s]+\s*/, '')}`);
+  showToast(`已切换为${ROLE_LABELS[role]}`);
 }
 
 function setAddAreaDragMode(enabled) {
@@ -240,7 +241,7 @@ function updateAreaMenuButtons(area) {
   setVisible(editAreaBtn, hasPermission('canEditArea'), 'block');
   setVisible(batchImportBtn, hasPermission('canBatchImportProduct'), 'block');
   setVisible(batchImageFromAreaBtn, hasPermission('canBatchImportImage'), 'block');
-  if (editProductsBtn) editProductsBtn.textContent = isProductEditable() ? '📦 管理商品' : '📦 商品陈列';
+  if (editProductsBtn) editProductsBtn.innerHTML = isProductEditable() ? '<i class="ti ti-package" aria-hidden="true"></i> 管理商品' : '<i class="ti ti-package" aria-hidden="true"></i> 商品陈列';
   if (area && area.locked) {
     lockAreaBtn.style.display = 'none';
     unlockAreaBtn.style.display = hasPermission('canUnlockArea') ? 'block' : 'none';
@@ -671,7 +672,7 @@ export function initUI() {
   modeSwitchBtn.addEventListener('click', chooseRole);
   snapBtn.addEventListener('click', () => {
     store.snapEnabled = !store.snapEnabled;
-    snapBtn.textContent = store.snapEnabled ? '📐 吸附开' : '📐 吸附关';
+    snapBtn.innerHTML = store.snapEnabled ? '<i class="ti ti-magnet" aria-hidden="true"></i> 吸附开' : '<i class="ti ti-magnet" aria-hidden="true"></i> 吸附关';
     snapBtn.classList.toggle('active', store.snapEnabled);
     showToast(store.snapEnabled ? '吸附开启' : '吸附关闭');
   });
@@ -691,7 +692,7 @@ export function initUI() {
   desktopModeBtn.addEventListener('click', () => {
     store.isDesktopMode = !store.isDesktopMode;
     document.body.classList.toggle('desktop-mode', store.isDesktopMode);
-    desktopModeBtn.textContent = store.isDesktopMode ? '📱' : '💻';
+    desktopModeBtn.innerHTML = store.isDesktopMode ? '<i class="ti ti-device-mobile" aria-hidden="true"></i>' : '<i class="ti ti-device-desktop" aria-hidden="true"></i>';
     store.MAX_SCALE = store.isDesktopMode ? 100 : 2.5;
     zoomSlider.max = store.MAX_SCALE;
     scheduleResetView();

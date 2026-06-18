@@ -185,34 +185,34 @@ function renderProductCardHtml(product, editable, search) {
     .join('');
   const metaHtml = matchedMetaHtml ? `<div class="prod-meta">${matchedMetaHtml}</div>` : '';
   const checkboxHtml = store.selectMode ? `<input type="checkbox" class="product-checkbox" ${store.selectedProductIds.has(product.id) ? 'checked' : ''}>` : '';
-  const starBadge = product.favorite ? '<div class="star-badge">⭐</div>' : '';
+  const starBadge = product.favorite ? '<div class="star-badge"><i class="ti ti-star" aria-hidden="true"></i></div>' : '';
   const imgSrc = escapeHtml(product.imageDataUrl || DEFAULT_PRODUCT_IMAGE);
   const imgHtml = `<div class="img-container"><img src="${imgSrc}" alt="${escapeHtml(product.name)}"></div>`;
   let actionsHtml = '';
   if (!store.selectMode) {
     actionsHtml = editable
-      ? '<div class="actions"><button class="edit-prod-btn" data-tooltip="编辑">✏️</button><button class="del-prod-btn" data-tooltip="删除">🗑️</button><button class="move-prod-btn" data-tooltip="移动">📦</button></div>'
-      : `<div class="actions"><button class="favorite-prod-btn" data-tooltip="${product.favorite ? '取消收藏' : '收藏'}">⭐</button><button class="download-img-prod-btn" data-tooltip="下载图片">📸</button><button class="download-csv-prod-btn" data-tooltip="下载商品页">📄</button></div>`;
+      ? '<div class="actions"><button class="edit-prod-btn" data-tooltip="编辑" aria-label="编辑"><i class="ti ti-edit" aria-hidden="true"></i></button><button class="del-prod-btn" data-tooltip="删除" aria-label="删除"><i class="ti ti-trash" aria-hidden="true"></i></button><button class="move-prod-btn" data-tooltip="移动" aria-label="移动"><i class="ti ti-package" aria-hidden="true"></i></button></div>'
+      : `<div class="actions"><button class="favorite-prod-btn" data-tooltip="${product.favorite ? '取消收藏' : '收藏'}" aria-label="${product.favorite ? '取消收藏' : '收藏'}"><i class="ti ti-star" aria-hidden="true"></i></button><button class="download-img-prod-btn" data-tooltip="下载图片" aria-label="下载图片"><i class="ti ti-camera" aria-hidden="true"></i></button><button class="download-csv-prod-btn" data-tooltip="下载商品页" aria-label="下载商品页"><i class="ti ti-file-text" aria-hidden="true"></i></button></div>`;
   }
   if (!store.selectMode) {
     const buttons = [];
     if (hasPermission('canFavoriteProduct')) {
-      buttons.push(`<button class="favorite-prod-btn" data-tooltip="${product.favorite ? '取消收藏' : '收藏'}">⭐</button>`);
+      buttons.push(`<button class="favorite-prod-btn" data-tooltip="${product.favorite ? '取消收藏' : '收藏'}" aria-label="${product.favorite ? '取消收藏' : '收藏'}"><i class="ti ti-star" aria-hidden="true"></i></button>`);
     }
     if (hasPermission('canDownloadProductImage')) {
-      buttons.push('<button class="download-img-prod-btn" data-tooltip="下载图片">📸</button>');
+      buttons.push('<button class="download-img-prod-btn" data-tooltip="下载图片" aria-label="下载图片"><i class="ti ti-camera" aria-hidden="true"></i></button>');
     }
     if (hasPermission('canDownloadProductCsv')) {
-      buttons.push('<button class="download-csv-prod-btn" data-tooltip="下载商品页">📄</button>');
+      buttons.push('<button class="download-csv-prod-btn" data-tooltip="下载商品页" aria-label="下载商品页"><i class="ti ti-file-text" aria-hidden="true"></i></button>');
     }
     if (editable && hasPermission('canEditProduct')) {
-      buttons.push('<button class="edit-prod-btn" data-tooltip="编辑">✏️</button>');
+      buttons.push('<button class="edit-prod-btn" data-tooltip="编辑" aria-label="编辑"><i class="ti ti-edit" aria-hidden="true"></i></button>');
     }
     if (editable && hasPermission('canDeleteProduct')) {
-      buttons.push('<button class="del-prod-btn" data-tooltip="删除">🗑️</button>');
+      buttons.push('<button class="del-prod-btn" data-tooltip="删除" aria-label="删除"><i class="ti ti-trash" aria-hidden="true"></i></button>');
     }
     if (editable && hasPermission('canMoveProduct')) {
-      buttons.push('<button class="move-prod-btn" data-tooltip="移动">📦</button>');
+      buttons.push('<button class="move-prod-btn" data-tooltip="移动" aria-label="移动"><i class="ti ti-package" aria-hidden="true"></i></button>');
     }
     actionsHtml = buttons.length ? `<div class="actions">${buttons.join('')}</div>` : '';
   }

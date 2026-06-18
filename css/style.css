@@ -277,6 +277,7 @@
     }
 
     * { -webkit-tap-highlight-color: transparent; }
+    .ti { vertical-align: -0.125em; line-height: 1; pointer-events: none; }
     body {
       color: var(--ink);
       background: var(--bg-page);
