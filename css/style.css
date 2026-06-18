@@ -731,3 +731,88 @@
         bottom: 8px;
       }
     }
+
+    /* ===== 深色模式（跟随系统）===== */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --brand-soft: #2a1c10;
+        --ink: #e7e7ea;
+        --muted: #a7a7af;
+        --line: #313137;
+        --panel: #1e1e22;
+        --surface: #1e1e22;
+        --bg-page: #131316;
+        --bg-soft: #19191c;
+      }
+      body { background: var(--bg-page); }
+      .nav-bar .title,
+      .modal-header h3,
+      .map-select-header h4 { color: #f1f1f3; }
+      .icon-btn,
+      .undo-redo-group button,
+      .select-btn,
+      .scroll-buttons button,
+      .nav-arrow,
+      .toolbar button,
+      .toolbar select,
+      .sort-controls-compact select,
+      .product-zoom-slider,
+      .area-menu-btns button {
+        background: #26262b;
+        color: #d4d4d8;
+        border-color: #313137;
+      }
+      .btn-secondary { background: #2c2c32; color: #e7e7ea; }
+      .modal,
+      .announcement-modal,
+      .map-select-container,
+      .duplicate-dialog,
+      .image-batch-preview-container,
+      .loading-content { background: #1e1e22; color: #e7e7ea; }
+      .loading-text { color: #e7e7ea; }
+      .modal-body label,
+      .announcement-modal p,
+      .detail-table td { color: #c8c8cd; }
+      .detail-table td:first-child { color: #a7a7af; }
+      .modal-body input[type="text"],
+      .modal-body input[type="number"],
+      .modal-body select,
+      .modal-body textarea,
+      .modal-body input[type="file"],
+      .readonly-field { background: #26262b; color: #e7e7ea; border-color: #34343b; }
+      #searchInput { color: #e7e7ea; }
+      #searchInput::placeholder { color: #8a8a92; }
+      .product-card { background: #1e1e22; border-color: #313137; }
+      .product-card .prod-name { color: #f1f1f3; }
+      .product-card .img-container { background: #26262b; border-color: #313137; }
+      .product-card .actions button { background: #26262b; border-color: #313137; }
+      .product-card.selected { background: #2a1c10; }
+      .product-card.starred { background: #2a230f; }
+      .prod-meta, .prod-meta-label { color: #b9b9c0; }
+      .prod-meta-line { background: rgba(255,255,255,.04); border-color: rgba(249,115,22,.22); }
+      .toolbar-row { background: #19191c; border-color: #313137; }
+      .style-copy-area { background: #16202b; }
+      .field-mapping,
+      .preview-area,
+      .image-preview-item { background: #19191c; color: #d4d4d8; }
+      .direction-option { background: #26262b; border-color: #34343b; color: #d4d4d8; }
+      .direction-option.selected { background: #2a1c10; }
+      .duplicate-dialog .product-info,
+      .duplicate-dialog .option-btn { background: #26262b; color: #e7e7ea; border-color: #34343b; }
+      .scroll-buttons { background: #1e1e22; border-color: #313137; }
+      .batch-action-bar { background: #1e1e22; }
+      #selectedCount { color: #e7e7ea; }
+      .import-banner { color: #fdba74; }
+      .modal-close-btn,
+      .map-select-header button,
+      .image-batch-preview-header button,
+      .close-preview {
+        background: #26262b !important;
+        color: #a7a7af !important;
+        border-color: #34343b !important;
+      }
+      .map-canvas-wrapper { background: #131316; }
+      .map-select-canvas { background: #1e1e22; }
+      .mini-map-canvas { background: rgba(28,28,32,.92); }
+      .excel-hint, .map-select-footer { color: #8a8a92; }
+    }
