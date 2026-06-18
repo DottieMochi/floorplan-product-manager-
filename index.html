@@ -24,17 +24,17 @@
   <div class="nav-bar">
     <span class="title">🏢 区域导航</span>
     <div class="nav-actions">
-      <div class="zoom-slider-container"><span>🔍</span><input type="range" id="zoomSlider" min="0.2" max="5" step="0.05" value="1"><span>🔎</span></div>
-      <div class="undo-redo-group"><button id="undoBtn" title="撤回 (Ctrl+Z)">↩️</button><button id="redoBtn" title="复原 (Ctrl+Y)">↪️</button><button id="clearHistoryBtn" title="清空历史记录">🧹</button></div>
-      <button class="icon-btn" id="orientationBtn">🔄</button>
-      <button class="icon-btn" id="desktopModeBtn">💻</button>
-      <button class="mode-badge" id="modeSwitchBtn">👤 游客</button>
+      <div class="zoom-slider-container"><span aria-hidden="true">🔍</span><input type="range" id="zoomSlider" min="0.2" max="5" step="0.05" value="1" aria-label="地图缩放"><span aria-hidden="true">🔎</span></div>
+      <div class="undo-redo-group"><button id="undoBtn" title="撤回 (Ctrl+Z)" aria-label="撤回">↩️</button><button id="redoBtn" title="复原 (Ctrl+Y)" aria-label="复原">↪️</button><button id="clearHistoryBtn" title="清空历史记录" aria-label="清空历史记录">🧹</button></div>
+      <button class="icon-btn" id="orientationBtn" aria-label="切换横竖屏方向">🔄</button>
+      <button class="icon-btn" id="desktopModeBtn" aria-label="切换桌面/手机视图">💻</button>
+      <button class="mode-badge" id="modeSwitchBtn" aria-label="切换角色身份">👤 游客</button>
     </div>
   </div>
   <div class="content">
     <div class="import-banner" id="importBanner">📂 没有找到卖场数据，请导入备份文件 <button id="bannerImportBtn">📥 导入</button></div>
-    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn">🔍</button></div>
-    <div class="canvas-wrapper"><canvas id="mapCanvas"></canvas><canvas id="miniMapCanvas" class="mini-map-canvas" title="点击小地图跳转视图"></canvas><div id="addAreaHint" class="add-area-hint">拖拽画布拉出新区域</div></div>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." aria-label="搜索商品名或条码" list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn" aria-label="搜索">🔍</button></div>
+    <div class="canvas-wrapper"><canvas id="mapCanvas" role="img" aria-label="可缩放、可平移的卖场区域地图"></canvas><canvas id="miniMapCanvas" class="mini-map-canvas" title="点击小地图跳转视图" aria-label="小地图，点击可跳转视图"></canvas><div id="addAreaHint" class="add-area-hint">拖拽画布拉出新区域</div></div>
     <div class="toolbar" id="mainToolbar">
       <button class="export-btn" id="exportBtn">📤 导出</button>
       <button class="import-btn" id="importBtn">📥 导入</button>
@@ -61,7 +61,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="areaMenuTitle"></h3>
-      <button class="modal-close-btn">&times;</button>
+      <button class="modal-close-btn" aria-label="关闭">&times;</button>
     </div>
     <div class="modal-body">
       <div style="text-align: center; margin-bottom: 15px;"><div id="areaMenuCode" style="font-size: 12px; color: #666;">编号：---</div></div>
@@ -80,7 +80,7 @@
 <!-- 批量导入商品弹窗 -->
 <div class="modal-overlay" id="batchImportModal">
   <div class="modal">
-    <div class="modal-header"><h3>批量导入商品</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-header"><h3>批量导入商品</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
     <div class="modal-body">
       <label>📎 选择Excel文件</label>
       <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" />
@@ -102,7 +102,7 @@
 <!-- 批量导入图片弹窗 -->
 <div class="modal-overlay" id="batchImageModal">
   <div class="modal">
-    <div class="modal-header"><h3>批量导入图片</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-header"><h3>批量导入图片</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
     <div class="modal-body">
       <label>📸 选择图片文件（可多选）</label>
       <input type="file" id="imageFileInput" accept="image/*" multiple />
@@ -115,7 +115,7 @@
 <!-- 编辑区域信息弹窗 -->
 <div class="modal-overlay" id="editAreaModal">
   <div class="modal">
-    <div class="modal-header"><h3>编辑区域信息</h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-header"><h3>编辑区域信息</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
     <div class="modal-body">
       <div class="style-copy-area"><label>🎨 样式快速操作</label><div class="style-copy-buttons"><button class="btn-info" id="copyStyleBtn">📋 复制样式</button><button class="btn-success" id="pasteStyleBtn">📎 粘贴样式</button></div></div>
       <label>区域编码</label><div class="readonly-field" id="areaCodeDisplay">-</div>
@@ -138,11 +138,11 @@
 <!-- 商品陈列弹窗 -->
 <div class="modal-overlay" id="productsModal">
   <div class="modal">
-    <div class="modal-header"><h3 id="productsTitle"></h3><button class="modal-close-btn">&times;</button></div>
+    <div class="modal-header"><h3 id="productsTitle"></h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
     <div class="modal-body" id="productsModalBody">
       <div class="toolbar-row">
         <div class="sort-controls-compact"><select id="sortFieldSelect"><option value="lastModified">修改时间</option><option value="name">名称</option><option value="stock">库存数量</option></select><select id="sortOrderSelect"><option value="asc">升序</option><option value="desc">降序</option></select></div>
-        <div class="product-zoom-slider"><span>🔍</span><input type="range" id="productZoomSlider" min="1" max="6" step="1" value="2"><span>列</span></div>
+        <div class="product-zoom-slider"><span aria-hidden="true">🔍</span><input type="range" id="productZoomSlider" min="1" max="6" step="1" value="2" aria-label="每行显示的商品列数"><span>列</span></div>
         <div class="select-toolbar"><button class="select-btn" id="selectModeBtn">☑️ 多选</button><button class="select-btn" id="selectAllBtn">✅ 全选</button></div>
       </div>
       <div class="product-grid-container"><div class="product-grid" id="productGrid"></div><div class="scroll-buttons"><button id="scrollToTopBtn" title="回到顶部">⬆️ 顶部</button><button id="scrollToBottomBtn" title="到底部">⬇️ 底部</button></div></div>
@@ -152,13 +152,13 @@
   </div>
 </div>
 <!-- 商品编辑弹窗 -->
-<div class="modal-overlay" id="productEditModal"><div class="modal"><div class="modal-header"><h3 id="productEditTitle">编辑商品</h3><button class="modal-close-btn">&times;</button></div><div class="modal-body"><label>商品名称 *</label><input type="text" id="productName" /><label>条码</label><input type="text" id="productBarcode" /><label>规格</label><input type="text" id="productSpec" /><label>单位</label><input type="text" id="productUnit" /><label>库存数量</label><input type="number" id="productStock" step="1" value="0" /><label>商品图片</label><input type="file" id="productImage" accept="image/*" /><label>最后修改时间</label><div class="readonly-field" id="productLastModified">-</div><div class="modal-buttons"><button class="btn-secondary" id="cancelProductBtn">取消</button><button class="btn-primary" id="saveProductBtn">保存</button></div></div></div></div>
+<div class="modal-overlay" id="productEditModal"><div class="modal"><div class="modal-header"><h3 id="productEditTitle">编辑商品</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><label>商品名称 *</label><input type="text" id="productName" /><label>条码</label><input type="text" id="productBarcode" /><label>规格</label><input type="text" id="productSpec" /><label>单位</label><input type="text" id="productUnit" /><label>库存数量</label><input type="number" id="productStock" step="1" value="0" /><label>商品图片</label><input type="file" id="productImage" accept="image/*" /><label>最后修改时间</label><div class="readonly-field" id="productLastModified">-</div><div class="modal-buttons"><button class="btn-secondary" id="cancelProductBtn">取消</button><button class="btn-primary" id="saveProductBtn">保存</button></div></div></div></div>
 <!-- 商品详情弹窗 -->
-<div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn">▶</button></div><img id="detailImage" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
+<div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn" aria-label="上一个商品">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn" aria-label="下一个商品">▶</button></div><img id="detailImage" alt="商品图片" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
 <!-- 地图选择窗口 -->
-<div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4>📌 选择目标区域</h4><button id="closeMapSelectBtn">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
+<div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4>📌 选择目标区域</h4><button id="closeMapSelectBtn" aria-label="关闭">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
 <!-- 大图预览 -->
-<div class="image-preview-overlay" id="imagePreviewOverlay"><button class="close-preview" id="closePreviewBtn">&times;</button><img id="previewImage" src="" /></div>
+<div class="image-preview-overlay" id="imagePreviewOverlay"><button class="close-preview" id="closePreviewBtn" aria-label="关闭">&times;</button><img id="previewImage" src="" alt="商品大图预览" /></div>
 <!-- 商品批量操作栏 -->
 <div id="batchActionBar" class="batch-action-bar" style="display: none;">
   <span id="selectedCount">已选择 0 个商品</span>

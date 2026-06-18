@@ -741,6 +741,17 @@ export function initUI() {
       showToast('已取消添加区域');
       return;
     }
+    if (e.key === 'Escape') {
+      // 按 Esc 关闭当前打开的弹窗（与右上角 × 行为一致，按层级从上到下查找）
+      const overlays = [
+        document.getElementById('imagePreviewOverlay'),
+        document.getElementById('mapSelectOverlay'),
+        ...document.querySelectorAll('.modal-overlay'),
+        document.getElementById('announcementOverlay')
+      ];
+      const open = overlays.find(el => el && getComputedStyle(el).display !== 'none');
+      if (open) { open.style.display = 'none'; return; }
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); if (requirePermission('canUndoRedo')) undo(); }
     else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'Z' && e.shiftKey))) { e.preventDefault(); if (requirePermission('canUndoRedo')) redo(); }
   });
