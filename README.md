@@ -4,6 +4,8 @@
 
 > A client-side-only demo for navigating display areas and managing products on a zoomable canvas. All data lives in the browser's IndexedDB — nothing is sent to any server.
 
+**🔗 在线体验 / Live demo:** https://dottiemochi.github.io/floorplan-product-manager-/
+
 ## 🖼️ 界面预览
 
 | 浅色 Light | 深色 Dark |
