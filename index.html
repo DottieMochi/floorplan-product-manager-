@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>区域导航 · Area Navigator V0.92</title>
+  <title>区域导航 · Area Navigator V0.93</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,9 +12,9 @@
   <div class="announcement-modal">
     <h2>📢 产品使用说明</h2>
     <p><strong>类型：</strong>开源前端演示项目</p>
-    <p><strong>版本：</strong>0.92 (图标悬停+关闭修复)</p>
-    <p><strong>更新内容：</strong>编辑模式下商品操作按钮改为纯图标(✏️🗑️📦)，鼠标悬停显示文字提示；修复所有弹窗“×”关闭按钮无效的问题；完整保留批量移动/删除、区域多选、样式复制、按规格识别表头等功能。</p>
-    <div class="version">区域导航 Area Navigator V0.92</div>
+    <p><strong>版本：</strong>0.93 (扫码搜索+图片识别)</p>
+    <p><strong>更新内容：</strong>新增摄像头扫码、选择图片扫码和条码数字 OCR 兜底；游客可扫码定位商品，工作人员/设计者可在商品编辑弹窗中扫码录入条码；扫码图片无法识别时可手动确认条码。</p>
+    <div class="version">区域导航 Area Navigator V0.93</div>
     <div class="announcement-buttons">
       <button class="btn-acknowledge" id="btnAcknowledge">我已知悉</button>
       <button class="btn-close-announce" id="btnCloseAnnounce"><i class="ti ti-x" aria-hidden="true"></i> 关闭</button>
@@ -34,7 +34,7 @@
   </div>
   <div class="content">
     <div class="import-banner" id="importBanner"><i class="ti ti-folder-open" aria-hidden="true"></i> 没有找到卖场数据，请导入备份文件 <button id="bannerImportBtn"><i class="ti ti-download" aria-hidden="true"></i> 导入</button></div>
-    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." aria-label="搜索商品名或条码" list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="searchBtn" aria-label="搜索"><i class="ti ti-search" aria-hidden="true"></i></button></div>
+    <div class="search-box"><input type="text" id="searchInput" placeholder="搜索商品名/条码..." aria-label="搜索商品名或条码" list="searchHistoryList" /><datalist id="searchHistoryList"></datalist><button id="scanBtn" aria-label="摄像头扫码" title="摄像头扫码"><i class="ti ti-scan" aria-hidden="true"></i></button><button id="searchBtn" aria-label="搜索"><i class="ti ti-search" aria-hidden="true"></i></button></div>
     <div class="canvas-wrapper"><canvas id="mapCanvas" role="img" aria-label="可缩放、可平移的卖场区域地图"></canvas><canvas id="miniMapCanvas" class="mini-map-canvas" title="点击小地图跳转视图" aria-label="小地图，点击可跳转视图"></canvas><div id="addAreaHint" class="add-area-hint">拖拽画布拉出新区域</div></div>
     <div class="toolbar" id="mainToolbar">
       <button class="export-btn" id="exportBtn"><i class="ti ti-upload" aria-hidden="true"></i> 导出</button>
@@ -153,9 +153,31 @@
   </div>
 </div>
 <!-- 商品编辑弹窗 -->
-<div class="modal-overlay" id="productEditModal"><div class="modal"><div class="modal-header"><h3 id="productEditTitle">编辑商品</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><label>商品名称 *</label><input type="text" id="productName" /><label>条码</label><input type="text" id="productBarcode" /><label>规格</label><input type="text" id="productSpec" /><label>单位</label><input type="text" id="productUnit" /><label>库存数量</label><input type="number" id="productStock" step="1" value="0" /><label>商品图片</label><input type="file" id="productImage" accept="image/*" /><label>最后修改时间</label><div class="readonly-field" id="productLastModified">-</div><div class="modal-buttons"><button class="btn-secondary" id="cancelProductBtn">取消</button><button class="btn-primary" id="saveProductBtn">保存</button></div></div></div></div>
+<div class="modal-overlay" id="productEditModal"><div class="modal"><div class="modal-header"><h3 id="productEditTitle">编辑商品</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><label>商品名称 *</label><input type="text" id="productName" /><label>条码</label><div style="display:flex;gap:8px;align-items:center;"><input type="text" id="productBarcode" style="flex:1;margin:6px 0;" /><button type="button" class="btn-info" id="scanBarcodeBtn" style="flex:0 0 auto;padding:10px 14px;border-radius:10px;" aria-label="扫码填入条码" title="扫码填入条码"><i class="ti ti-scan" aria-hidden="true"></i></button></div><label>规格</label><input type="text" id="productSpec" /><label>单位</label><input type="text" id="productUnit" /><label>库存数量</label><input type="number" id="productStock" step="1" value="0" /><label>商品图片</label><input type="file" id="productImage" accept="image/*" capture="environment" /><label>最后修改时间</label><div class="readonly-field" id="productLastModified">-</div><div class="modal-buttons"><button class="btn-secondary" id="cancelProductBtn">取消</button><button class="btn-primary" id="saveProductBtn">保存</button></div></div></div></div>
 <!-- 商品详情弹窗 -->
 <div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn" aria-label="上一个商品">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn" aria-label="下一个商品">▶</button></div><img id="detailImage" alt="商品图片" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
+<!-- 摄像头扫码弹窗 -->
+<div class="modal-overlay" id="barcodeScannerModal">
+  <div class="modal scanner-modal">
+    <div class="modal-header">
+      <h3 id="barcodeScannerTitle">摄像头扫码</h3>
+      <button class="modal-close-btn" id="closeScannerBtn" aria-label="关闭">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="scanner-reader" id="barcodeScannerReader"></div>
+      <div class="scanner-status" id="barcodeScannerStatus">正在启动摄像头...</div>
+      <div class="scanner-manual" id="barcodeManualBox" style="display:none;">
+        <input type="text" id="barcodeManualInput" placeholder="手动输入条码" inputmode="numeric" autocomplete="off" />
+        <button class="btn-primary" id="useManualBarcodeBtn">使用此条码</button>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-info" id="scanImageBtn"><i class="ti ti-photo-scan" aria-hidden="true"></i> 选择图片扫码</button>
+        <button class="btn-secondary" id="cancelScannerBtn">取消</button>
+      </div>
+      <input type="file" id="barcodeImageInput" accept="image/*" style="display:none;" />
+    </div>
+  </div>
+</div>
 <!-- 地图选择窗口 -->
 <div class="map-select-overlay" id="mapSelectOverlay"><div class="map-select-container"><div class="map-select-header"><h4><i class="ti ti-map-pin" aria-hidden="true"></i> 选择目标区域</h4><button id="closeMapSelectBtn" aria-label="关闭">&times;</button></div><div class="map-canvas-wrapper"><canvas id="mapSelectCanvas" class="map-select-canvas"></canvas></div><div class="map-select-footer">点击区域即可移动商品</div></div></div>
 <!-- 大图预览 -->
@@ -174,6 +196,9 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <!-- 使用可用的 JSZip CDN -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js"></script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

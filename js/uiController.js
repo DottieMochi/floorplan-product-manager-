@@ -14,6 +14,7 @@ import {
 } from './productManager.js';
 import { openMapSelect, initMapSelect, initBatchImport } from './batchImport.js';
 import { showToast, genId, genAreaId, generateAreaCode, formatTimestamp } from './utils.js';
+import { initBarcodeScanner, openBarcodeScanner } from './scanner.js';
 
 // DOM 元素引用
 const canvas = document.getElementById('mapCanvas');
@@ -25,6 +26,7 @@ const resetViewBtn = document.getElementById('resetViewBtn');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const searchBtn = document.getElementById('searchBtn');
+const scanBtn = document.getElementById('scanBtn');
 const searchInput = document.getElementById('searchInput');
 const orientationBtn = document.getElementById('orientationBtn');
 const desktopModeBtn = document.getElementById('desktopModeBtn');
@@ -56,6 +58,7 @@ const batchDownloadImgBtn = document.getElementById('batchDownloadImgBtn');
 const batchDownloadCsvBtn = document.getElementById('batchDownloadCsvBtn');
 const batchCancelBtn = document.getElementById('batchCancelBtn');
 const addProductBtn = document.getElementById('addProductBtn');
+const scanBarcodeBtn = document.getElementById('scanBarcodeBtn');
 const closeProductsBtn = document.getElementById('closeProductsBtn');
 const productZoomSlider = document.getElementById('productZoomSlider');
 const sortFieldSelect = document.getElementById('sortFieldSelect');
@@ -616,14 +619,16 @@ async function saveProduct() {
   };
   const fileInput = document.getElementById('productImage');
   const processSave = async (imageUrl = null) => {
-    productData.imageDataUrl = imageUrl || '';
     if (store.editingProductId) {
       const existing = area.products.find(p => p.id === store.editingProductId);
       if (existing) {
+        productData.imageDataUrl = imageUrl || existing.imageDataUrl || '';
+        productData.favorite = Boolean(existing.favorite);
         Object.assign(existing, productData);
         existing.lastModified = now;
       }
     } else {
+      productData.imageDataUrl = imageUrl || '';
       area.products.push(productData);
     }
     await pushState();
@@ -660,11 +665,15 @@ function showNextProduct() {
 export function initUI() {
   loadSearchHistory();
   refreshRoleUI();
+  initBarcodeScanner();
   // 全局关闭模态框
   document.body.addEventListener('click', (e) => {
     if (e.target.classList && e.target.classList.contains('modal-close-btn')) {
       const modal = e.target.closest('.modal-overlay');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        if (modal.id === 'barcodeScannerModal') window.dispatchEvent(new Event('barcodeScannerCloseRequested'));
+        modal.style.display = 'none';
+      }
     }
   });
 
@@ -709,6 +718,19 @@ export function initUI() {
     drawMap();
   });
   searchBtn.addEventListener('click', searchAndOpen);
+  if (scanBtn) {
+    scanBtn.addEventListener('click', () => {
+      if (!requirePermission('canSearch')) return;
+      openBarcodeScanner({
+        title: '扫描商品条码',
+        status: '请将商品条码放入取景框，识别后自动搜索',
+        onScan: (code) => {
+          searchInput.value = code;
+          searchAndOpen();
+        }
+      });
+    });
+  }
   searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') searchBtn.click(); });
   exportBtn.onclick = exportData;
   const importFileInputGlobal = document.createElement('input');
@@ -751,7 +773,11 @@ export function initUI() {
         document.getElementById('announcementOverlay')
       ];
       const open = overlays.find(el => el && getComputedStyle(el).display !== 'none');
-      if (open) { open.style.display = 'none'; return; }
+      if (open) {
+        if (open.id === 'barcodeScannerModal') window.dispatchEvent(new Event('barcodeScannerCloseRequested'));
+        open.style.display = 'none';
+        return;
+      }
     }
     if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); if (requirePermission('canUndoRedo')) undo(); }
     else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'Z' && e.shiftKey))) { e.preventDefault(); if (requirePermission('canUndoRedo')) redo(); }
@@ -852,6 +878,19 @@ export function initUI() {
   });
   document.getElementById('cancelProductBtn').addEventListener('click', () => document.getElementById('productEditModal').style.display = 'none');
   document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
+  if (scanBarcodeBtn) {
+    scanBarcodeBtn.addEventListener('click', () => {
+      if (!requirePermission(store.editingProductId ? 'canEditProduct' : 'canAddProduct')) return;
+      openBarcodeScanner({
+        title: '扫码填入条码',
+        status: '请将商品条码放入取景框，识别后自动填入',
+        onScan: (code) => {
+          document.getElementById('productBarcode').value = code;
+          showToast('已填入条码');
+        }
+      });
+    });
+  }
   closeProductsBtn.addEventListener('click', () => {
     productsModal.style.display = 'none';
     if (store.selectMode) {
