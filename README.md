@@ -12,6 +12,7 @@
 - **批量导入**：从 Excel / CSV 导入商品（自动识别含"规格"的表头行 + 字段映射）；按条码匹配批量导入图片
 - **导入 / 导出**：整套数据的 JSON 备份与恢复
 - **三级角色**：游客 / 工作人员 / 设计者，按角色控制可见操作
+- **界面**：扁平精炼风格 + 统一线性图标，支持**深色模式**（跟随系统）、响应式（手机 / 桌面），并补充了无障碍标签（aria-label / alt、Esc 关闭弹窗）
 
 ## 🚀 运行
 
@@ -51,13 +52,16 @@ export const ROLE_PASSWORDS = {
 - 原生 HTML / CSS / JavaScript（ES Modules），无构建步骤、无框架
 - [SheetJS (xlsx)](https://sheetjs.com/) — 解析 Excel / CSV（CDN 引入）
 - [JSZip](https://stuk.github.io/jszip/) — 打包下载图片（CDN 引入）
+- [Tabler Icons](https://tabler.io/icons) — 线性图标字体（CDN 引入）
 - 浏览器 IndexedDB — 本地持久化
 
 ## 📁 结构
 
 ```
 .
-├─ index.html          # 页面骨架 + 全部样式 + 弹窗
+├─ index.html          # 页面骨架 + 弹窗结构
+├─ css/
+│  └─ style.css        # 全部样式（含风格主题与深色模式）
 └─ js/
    ├─ main.js          # 启动入口
    ├─ store.js         # 全局状态、角色与权限
