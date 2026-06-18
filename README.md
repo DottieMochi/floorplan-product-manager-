@@ -96,3 +96,7 @@ export const ROLE_PASSWORDS = {
 ## 📄 许可
 
 [MIT](LICENSE) © Daisy Mimi
+
+## 🤝 协作致谢
+
+本项目在功能优化和代码实现过程中使用了 Claude 与 Codex 辅助协作。
