@@ -5,6 +5,7 @@ import { openDB, loadDataFromDB, pushState, saveDataOnly } from './areaStore.js'
 import { initProductManager } from './productManager.js';
 import { initUI } from './uiController.js';
 import { cleanAreaData, ensureAreaCode, showToast } from './utils.js';
+import { DEMO_AREAS } from './demoData.js';
 
 // 挂载全局变量（用于调试，但注意不要直接赋值覆盖）
 window.store = store;
@@ -14,13 +15,11 @@ async function init() {
   loadSavedUserRole();
   await openDB();
   let saved = await loadDataFromDB();
-  if (saved && saved.length) {
-    const cleaned = saved.map(cleanAreaData);
-    for (const area of cleaned) ensureAreaCode(area, cleaned);
-    store.areas = cleaned;
-  } else {
-    store.areas = [];
-  }
+  const usingDemo = !(saved && saved.length);
+  const source = usingDemo ? DEMO_AREAS : saved;
+  const cleaned = source.map(cleanAreaData);
+  for (const area of cleaned) ensureAreaCode(area, cleaned);
+  store.areas = cleaned;
   pushState();
 
   const canvas = document.getElementById('mapCanvas');
@@ -45,7 +44,7 @@ async function init() {
     if (ld) ld.remove();
   }
 
-  showToast('欢迎使用区域导航系统');
+  showToast(usingDemo ? '已载入演示数据，可直接体验（编辑后将保存为你的数据）' : '欢迎使用区域导航系统');
 }
 
 init();
