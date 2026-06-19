@@ -1,4 +1,5 @@
 *.json
+!manifest.json
 *.csv
 *.xlsx
 *.xls

@@ -1,0 +1,15 @@
+{
+  "name": "区域导航 · Area Navigator",
+  "short_name": "区域导航",
+  "description": "纯前端区域陈列与商品管理工具，离线可用。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f5f4",
+  "theme_color": "#f97316",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
