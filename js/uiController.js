@@ -166,34 +166,53 @@ export function refreshRoleUI() {
   drawMap();
 }
 
-function chooseRole() {
-  const answer = prompt('请选择角色：\n1. 游客\n2. 工作人员\n3. 设计者', store.currentUserRole === ROLE_KEYS.STAFF ? '2' : store.currentUserRole === ROLE_KEYS.DESIGNER ? '3' : '1');
-  if (answer === null) return;
-  const roleMap = {
-    '1': ROLE_KEYS.GUEST,
-    guest: ROLE_KEYS.GUEST,
-    '游客': ROLE_KEYS.GUEST,
-    '2': ROLE_KEYS.STAFF,
-    staff: ROLE_KEYS.STAFF,
-    '工作人员': ROLE_KEYS.STAFF,
-    '3': ROLE_KEYS.DESIGNER,
-    designer: ROLE_KEYS.DESIGNER,
-    '设计者': ROLE_KEYS.DESIGNER
-  };
-  const role = roleMap[String(answer).trim()];
-  if (!role) {
-    showToast('请选择有效角色');
-    return;
-  }
-  const password = ROLE_PASSWORDS[role];
-  if (password && prompt('请输入密码') !== password) {
-    showToast('密码错误');
-    return;
-  }
+let pendingRole = null;
+
+function applyRole(role) {
   setCurrentUserRole(role);
   refreshRoleUI();
   refreshCurrentProductGrid();
   showToast(`已切换为${ROLE_LABELS[role]}`);
+}
+
+// 打开角色选择弹窗（替代浏览器原生 prompt，兼容所有移动浏览器）
+function chooseRole() {
+  const modal = document.getElementById('roleModal');
+  if (!modal) return;
+  pendingRole = null;
+  const pwBox = document.getElementById('rolePasswordBox');
+  if (pwBox) pwBox.style.display = 'none';
+  modal.style.display = 'flex';
+}
+
+function selectRoleFromModal(role) {
+  if (!role) return;
+  const password = ROLE_PASSWORDS[role];
+  if (password) {
+    pendingRole = role;
+    const pwBox = document.getElementById('rolePasswordBox');
+    const pwInput = document.getElementById('rolePasswordInput');
+    if (pwBox) pwBox.style.display = 'block';
+    if (pwInput) { pwInput.value = ''; setTimeout(() => pwInput.focus(), 0); }
+  } else {
+    const modal = document.getElementById('roleModal');
+    if (modal) modal.style.display = 'none';
+    applyRole(role);
+  }
+}
+
+function confirmRolePassword() {
+  if (!pendingRole) return;
+  const pwInput = document.getElementById('rolePasswordInput');
+  if (ROLE_PASSWORDS[pendingRole] !== (pwInput ? pwInput.value : '')) {
+    showToast('密码错误');
+    return;
+  }
+  const role = pendingRole;
+  pendingRole = null;
+  const modal = document.getElementById('roleModal');
+  if (modal) modal.style.display = 'none';
+  applyRole(role);
 }
 
 function setAddAreaDragMode(enabled) {
@@ -679,6 +698,23 @@ export function initUI() {
 
   // 模式切换
   modeSwitchBtn.addEventListener('click', chooseRole);
+  const roleModal = document.getElementById('roleModal');
+  if (roleModal) {
+    roleModal.querySelectorAll('[data-role]').forEach(btn =>
+      btn.addEventListener('click', () => selectRoleFromModal(btn.dataset.role)));
+    const pwConfirm = document.getElementById('rolePwConfirm');
+    if (pwConfirm) pwConfirm.addEventListener('click', confirmRolePassword);
+    const pwInput = document.getElementById('rolePasswordInput');
+    if (pwInput) pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmRolePassword(); });
+    const pwCancel = document.getElementById('rolePwCancel');
+    if (pwCancel) pwCancel.addEventListener('click', () => {
+      pendingRole = null;
+      const box = document.getElementById('rolePasswordBox');
+      if (box) box.style.display = 'none';
+    });
+    const closeRole = document.getElementById('closeRoleModalBtn');
+    if (closeRole) closeRole.addEventListener('click', () => { roleModal.style.display = 'none'; });
+  }
   snapBtn.addEventListener('click', () => {
     store.snapEnabled = !store.snapEnabled;
     snapBtn.innerHTML = store.snapEnabled ? '<i class="ti ti-magnet" aria-hidden="true"></i> 吸附开' : '<i class="ti ti-magnet" aria-hidden="true"></i> 吸附关';

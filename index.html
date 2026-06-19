@@ -165,6 +165,25 @@
 <!-- 商品详情弹窗 -->
 <div class="modal-overlay" id="productDetailModal"><div class="modal"><div class="modal-header"><h3 id="detailTitle"></h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div><div class="modal-body"><div class="detail-nav"><button class="nav-arrow" id="prevProductBtn" aria-label="上一个商品">◀</button><span class="detail-counter" id="detailCounter"></span><button class="nav-arrow" id="nextProductBtn" aria-label="下一个商品">▶</button></div><img id="detailImage" alt="商品图片" style="max-width:200px;max-height:200px;" /><table class="detail-table"><tr><td>条码</td><td id="detailBarcode">-</td></tr><tr><td>规格</td><td id="detailSpec">-</td></tr><tr><td>单位</td><td id="detailUnit">-</td></tr><tr><td>库存数量</td><td id="detailStock">-</td></tr><tr><td>修改时间</td><td id="detailModified">-</td></tr></table><button class="btn-secondary" id="closeDetailBtn" style="margin-top:15px; width:100%;">关闭</button></div></div></div>
 <!-- 摄像头扫码弹窗 -->
+<!-- 切换角色弹窗 -->
+<div class="modal-overlay" id="roleModal">
+  <div class="modal">
+    <div class="modal-header"><h3>切换角色</h3><button class="modal-close-btn" aria-label="关闭">&times;</button></div>
+    <div class="modal-body">
+      <div class="area-menu-btns">
+        <button data-role="guest"><i class="ti ti-user" aria-hidden="true"></i> 游客</button>
+        <button data-role="staff"><i class="ti ti-tool" aria-hidden="true"></i> 工作人员</button>
+        <button data-role="designer"><i class="ti ti-palette" aria-hidden="true"></i> 设计者</button>
+      </div>
+      <div id="rolePasswordBox" style="display:none; margin-top:12px;">
+        <input type="password" id="rolePasswordInput" placeholder="请输入密码" autocomplete="off" />
+        <div class="modal-buttons"><button class="btn-secondary" id="rolePwCancel">取消</button><button class="btn-primary" id="rolePwConfirm">确认</button></div>
+      </div>
+      <button class="btn-secondary" id="closeRoleModalBtn" style="margin-top:12px; width:100%;">关闭</button>
+    </div>
+  </div>
+</div>
+<!-- 摄像头扫码弹窗 -->
 <div class="modal-overlay" id="barcodeScannerModal">
   <div class="modal scanner-modal">
     <div class="modal-header">

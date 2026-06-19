@@ -1,6 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .app-container { width: 100%; max-width: 500px; height: 100vh; max-height: 900px; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 30px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; transition: max-width 0.3s, border-radius 0.3s; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; min-height: 100dvh; }
+    .app-container { width: 100%; max-width: 500px; height: 100vh; height: 100dvh; max-height: 900px; display: flex; flex-direction: column; background: #fff; box-shadow: 0 0 30px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; transition: max-width 0.3s, border-radius 0.3s; }
     body.desktop-mode .app-container { max-width: 1200px; border-radius: 10px; }
     body.desktop-mode .modal { max-width: 600px; }
     .nav-bar { background: #fff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 8px; }
