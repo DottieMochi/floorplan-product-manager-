@@ -1,7 +1,8 @@
-// Service Worker：离线缓存。修改资源后请更新 CACHE 版本号。
-const CACHE = 'area-nav-v1';
+// Service Worker：离线缓存「应用外壳」（同源资源）。修改资源后请更新 CACHE 版本号。
+// 注意：跨域 CDN（图标字体、xlsx、扫码库等）一律不拦截，交给浏览器直接联网获取，
+// 以免把跨域样式表缓存成 opaque 响应导致样式（图标）失效。
+const CACHE = 'area-nav-v2';
 
-// 本地核心资源（安装时预缓存，必须可用）
 const CORE = [
   './',
   './index.html',
@@ -21,13 +22,6 @@ const CORE = [
   './icon-512.png'
 ];
 
-// 需要运行时缓存的第三方 CDN（首次联网用过后即可离线）
-const RUNTIME_HOSTS = [
-  'cdn.jsdelivr.net',
-  'cdn.sheetjs.com',
-  'tessdata.projectnaptha.com'
-];
-
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
 });
@@ -44,17 +38,14 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  const sameOrigin = url.origin === self.location.origin;
-  const isRuntimeCdn = RUNTIME_HOSTS.includes(url.hostname);
-  if (!sameOrigin && !isRuntimeCdn) return; // 其余跨域请求交给浏览器默认处理
+  // 只处理同源请求；跨域 CDN 不拦截，浏览器自行联网（图标字体等才能正确加载）
+  if (new URL(req.url).origin !== self.location.origin) return;
 
-  // 缓存优先；命中即用，未命中则联网并写入缓存；离线兜底到首页
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
       return fetch(req).then((resp) => {
-        if (resp && (resp.ok || resp.type === 'opaque')) {
+        if (resp && resp.ok) {
           const copy = resp.clone();
           caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
         }
