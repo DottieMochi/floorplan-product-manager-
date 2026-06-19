@@ -4,15 +4,15 @@
 
 > A client-side-only demo for navigating display areas and managing products on a zoomable canvas. All data lives in the browser's IndexedDB — nothing is sent to any server.
 
-**🔗 在线体验 / Live demo:** https://dottiemochi.github.io/floorplan-product-manager-/
+**在线体验 / Live demo:** https://dottiemochi.github.io/floorplan-product-manager-/
 
-## 🖼️ 界面预览
+## 界面预览
 
 | 浅色 Light | 深色 Dark |
 |:---:|:---:|
 | ![浅色界面预览](docs/preview-light.svg) | ![深色界面预览](docs/preview-dark.svg) |
 
-## ✨ 功能
+## 功能
 
 - **画布地图**：缩放、平移、吸附对齐、小地图（mini-map）快速跳转
 - **区域管理**：添加 / 编辑（名称、颜色、文字方向、形状、尺寸）/ 复制 / 删除 / 锁定 / 多选 / 样式刷
@@ -23,7 +23,7 @@
 - **三级角色**：游客 / 工作人员 / 设计者，按角色控制可见操作
 - **界面**：扁平精炼风格 + 统一线性图标，支持**深色模式**（跟随系统）、响应式（手机 / 桌面），并补充了无障碍标签（aria-label / alt、Esc 关闭弹窗）
 
-## 🚀 运行
+## 运行
 
 这是纯静态项目，但用了 ES Module（`<script type="module">`），需要通过 HTTP 服务访问，不能直接双击 `file://` 打开。
 
@@ -39,14 +39,14 @@ npx serve .
 
 然后浏览器打开 `http://localhost:8080`。也可以用 VS Code 的 **Live Server** 扩展打开 `index.html`。
 
-## 📷 扫码说明
+## 扫码说明
 
 - 摄像头扫码需要 **HTTPS** 或 `localhost` 环境；GitHub Pages 自带 HTTPS，可以正常使用。
 - 如果摄像头无法打开，或条码在商品照片里比较小，可以在扫码弹窗中选择图片扫码。
 - 图片扫码会依次尝试条码识别、一维码识别和数字 OCR；OCR 结果会校验 EAN/UPC 条码，无法确认时会让你手动确认。
 - 如果扫码后提示"未找到"，表示条码已识别成功，但当前本地商品库还没有录入这个条码。
 
-## 🔐 关于"角色密码"——请务必阅读
+## 角色密码（请务必阅读）
 
 本项目**没有后端**，所有代码都在浏览器里运行。因此：
 
@@ -63,7 +63,7 @@ export const ROLE_PASSWORDS = {
 
 如需真正的访问控制，请在前面加一层带鉴权的后端。
 
-## 🧱 技术栈
+## 技术栈
 
 - 原生 HTML / CSS / JavaScript（ES Modules），无构建步骤、无框架
 - [SheetJS (xlsx)](https://sheetjs.com/) — 解析 Excel / CSV（CDN 引入）
@@ -74,7 +74,7 @@ export const ROLE_PASSWORDS = {
 - [Tabler Icons](https://tabler.io/icons) — 线性图标字体（CDN 引入）
 - 浏览器 IndexedDB — 本地持久化
 
-## 📁 结构
+## 项目结构
 
 ```
 .
@@ -93,10 +93,10 @@ export const ROLE_PASSWORDS = {
    └─ utils.js         # 通用工具
 ```
 
-## 📄 许可
+## 许可
 
 [MIT](LICENSE) © Daisy Mimi
 
-## 🤝 协作致谢
+## 协作致谢
 
 本项目在功能优化和代码实现过程中使用了 Claude 与 Codex 辅助协作。
