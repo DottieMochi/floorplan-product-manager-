@@ -1,7 +1,7 @@
 // Service Worker：离线缓存「应用外壳」（同源资源）。修改资源后请更新 CACHE 版本号。
 // 注意：跨域 CDN（图标字体、xlsx、扫码库等）一律不拦截，交给浏览器直接联网获取，
 // 以免把跨域样式表缓存成 opaque 响应导致样式（图标）失效。
-const CACHE = 'area-nav-v2';
+const CACHE = 'area-nav-v3';
 
 const CORE = [
   './',
@@ -41,19 +41,18 @@ self.addEventListener('fetch', (event) => {
   // 只处理同源请求；跨域 CDN 不拦截，浏览器自行联网（图标字体等才能正确加载）
   if (new URL(req.url).origin !== self.location.origin) return;
 
+  // 网络优先：在线时总是拿最新版并更新缓存；断网时回退到缓存（离线可用）
   event.respondWith(
-    caches.match(req).then((cached) => {
+    fetch(req).then((resp) => {
+      if (resp && resp.ok) {
+        const copy = resp.clone();
+        caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
+      }
+      return resp;
+    }).catch(() => caches.match(req).then((cached) => {
       if (cached) return cached;
-      return fetch(req).then((resp) => {
-        if (resp && resp.ok) {
-          const copy = resp.clone();
-          caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
-        }
-        return resp;
-      }).catch(() => {
-        if (req.mode === 'navigate') return caches.match('./index.html');
-        return Response.error();
-      });
-    })
+      if (req.mode === 'navigate') return caches.match('./index.html');
+      return Response.error();
+    }))
   );
 });
